@@ -2,8 +2,8 @@ package edu.westminstercollege.cmpt355.minijava.node;
 
 import java.util.List;
 
-public /*sealed*/ interface Node
-    /*permits ...*/ {
+public sealed interface Node
+    permits Statement, Expression, TypeNode, DeclarationItem {
 
     default String getNodeDescription() {
         String fullName = getClass().getSimpleName();
