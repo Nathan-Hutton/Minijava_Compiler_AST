@@ -19,6 +19,19 @@ public class Main {
 
         var methodBody = parser.methodBody().n;
         AST.print(methodBody);
+
+        try {
+            var compiler = new Compiler(methodBody, CLASS_NAME);
+            compiler.compile(Path.of("test_output"));
+            jasmin.Main.main(new String[] {
+                    "-d", "out/test_compiled",
+                    String.format("test_output/%s.j", CLASS_NAME)
+            });
+        }
+        catch (SyntaxException e){
+            int line_num = e.getNode().ctx().start.getLine();
+            System.out.println("Error at line " + line_num + "\n" + e.getMessage());
+        }
     }
     private static String getClassNameFromPath(String path) {
         Path p = Path.of(path);

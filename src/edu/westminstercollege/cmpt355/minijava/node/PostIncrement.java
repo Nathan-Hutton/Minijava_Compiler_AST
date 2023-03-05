@@ -1,8 +1,10 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import java.util.List;
 
-public record PostIncrement(VariableAccess variable, String op) implements Expression {
+public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, String op) implements Expression {
     @Override
     public List<? extends Node> children() {
         return List.of(variable);

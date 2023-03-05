@@ -1,11 +1,10 @@
 package edu.westminstercollege.cmpt355.minijava;
 
+import edu.westminstercollege.cmpt355.minijava.node.*;
+
 public class SyntaxException extends Exception {
 
-    public SyntaxException() {
-        super();
-    }
-
+    private Node node;
     public SyntaxException(String message) {
         super(message);
     }
@@ -16,6 +15,19 @@ public class SyntaxException extends Exception {
 
     public SyntaxException(Throwable cause) {
         super(cause);
+    }
+
+    public SyntaxException(Node n){
+        this.node = n;
+    }
+
+    public SyntaxException(Node n, String s){
+        super(s);
+        this.node = n;
+    }
+
+    public Node getNode(){
+        return this.node;
     }
 
     protected SyntaxException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

@@ -1,8 +1,10 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import java.util.List;
 
-public record IntLiteral(int number) implements Expression {
+public record IntLiteral(ParserRuleContext ctx, int number) implements Expression {
     @Override
     public List<? extends Node> children() {
         return List.of();

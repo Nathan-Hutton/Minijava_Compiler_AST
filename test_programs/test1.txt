@@ -1,9 +1,6 @@
-// This is a line comment
-int x = 25;
-double z = 5.0, peanut, ampersand = z;
-/* This is a
-block comment
-*/
-print("\n\tx = ", x);
-x++;
-peanut = (int) (++x / (z + 5) - ampersand * ampersand);
+double a, b;
+a = 3;
+b = 4;
+double c2;
+c2 = a * a + b + b; // now c2 has been declared
+print("c squared is ", c2);
