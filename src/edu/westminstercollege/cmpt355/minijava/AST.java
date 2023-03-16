@@ -34,7 +34,7 @@ public class AST {
         String[] lines = root.getNodeDescription().split("\n");
         out.println(lines[0]);
         for (int i = 1; i < lines.length; ++i) {
-            for (boolean b: levels)
+            for (boolean b : levels)
                 out.printf("%3s", b ? "│ " : "");
             out.printf(" %s\n", lines[i]);
         }

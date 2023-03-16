@@ -2,6 +2,7 @@ grammar MiniJava;
 
 @parser::header {
 import edu.westminstercollege.cmpt355.minijava.node.*;
+import edu.westminstercollege.cmpt355.minijava.Type;
 }
 
 goal
@@ -15,27 +16,27 @@ returns [Block n]
         for (var stmt : $stmts)
             statements.add(stmt.n);
 
-        $n = new Block(statements);
+        $n = new Block($ctx, statements);
     }
     ;
 
 statement
 returns [Statement n]
     : ';' {
-        $n = new EmptyStatement();
+        $n = new EmptyStatement($ctx);
     }
     | '{' (stmts+=statement)* '}' {
         var statements = new ArrayList<Statement>();
         for (var stmt : $stmts)
             statements.add(stmt.n);
 
-        $n = new Block(statements);
+        $n = new Block($ctx, statements);
     }
     | variableDeclaration {
         $n = $variableDeclaration.n;
     }
     | expression ';' {
-        $n = new ExpressionStatement($expression.n);
+        $n = new ExpressionStatement($ctx, $expression.n);
     }
     ;
 
@@ -47,21 +48,20 @@ returns [VarDeclarations n]
         for (var dec : $decs)
             declarations.add(dec.n);
 
-        $n = new VarDeclarations($type.n, declarations);
+        $n = new VarDeclarations($ctx, $type.n, declarations);
     }
     ;
 
 variableDeclarationItem
 returns [DeclarationItem n]
     : NAME {
-        $n = new VarDeclaration($NAME.text);
+        $n = new VarDeclaration($ctx, $NAME.text);
     }
     | NAME '=' expression {
-        $n = new VarDeclarationInit($NAME.text, $expression.n);
+        $n = new VarDeclarationInit($ctx, $NAME.text, $expression.n);
     }
     ;
 
-// print()
 expression
 returns [Expression n]
     : 'print' '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
@@ -69,62 +69,64 @@ returns [Expression n]
         for (var expr : $exprs)
             expressions.add(expr.n);
 
-        $n = new Print(expressions);
+        $n = new Print($ctx, expressions);
     }
     | INT {
-        $n = new IntLiteral(Integer.parseInt($INT.text));
+        $n = new IntLiteral($ctx, Integer.parseInt($INT.text));
     }
     | DOUBLE {
-        $n = new DoubleLiteral(Double.parseDouble($DOUBLE.text));
+        $n = new DoubleLiteral($ctx, Double.parseDouble($DOUBLE.text));
     }
     | BOOLEAN {
-        $n = new BooleanLiteral(Boolean.parseBoolean($BOOLEAN.text));
+        $n = new BooleanLiteral($ctx, Boolean.parseBoolean($BOOLEAN.text));
     }
     | STRING {
-        $n = new StringLiteral($STRING.text);
+        $n = new StringLiteral($ctx, $STRING.text);
     }
     | NAME {
-        $n = new VariableAccess($NAME.text);
+        $n = new VariableAccess($ctx, $NAME.text);
     }
     | '(' expression ')' {
         $n = $expression.n;
     }
-    | NAME op=('++' | '--') {
-        $n = new PostIncrement(new VariableAccess($NAME.text), $op.text);
+    | expression op=('++' | '--') {
+        $n = new PostIncrement($ctx, new VariableAccess($ctx, $expression.text), $op.text);
     }
     | op=('++' | '--' | '+' | '-') expression {
         if ($op.text.equals("++") || $op.text.equals("--"))
-            $n = new PreIncrement(new VariableAccess($expression.text), $op.text);
+            $n = new PreIncrement($ctx, new VariableAccess($ctx, $expression.text), $op.text);
         else if ($op.text.equals("-"))
-            $n = new Negate($expression.n);
+            $n = new Negate($ctx, $expression.n);
+        else if ($op.text.equals("+"))
+            $n = $expression.n;
     }
     | '(' type ')' expression {
-        $n = new Cast(new TypeNode($type.text), $expression.n);
+        $n = new Cast($ctx, $type.n, $expression.n);
     }
     | l=expression op=('*' | '/' | '%') r=expression {
-        $n = new BinaryOp($l.n, $op.text, $r.n);
+        $n = new BinaryOp($ctx, $l.n, $op.text, $r.n);
     }
     | l=expression op=('+' | '-') r=expression {
-        $n = new BinaryOp($l.n, $op.text, $r.n);
+        $n = new BinaryOp($ctx, $l.n, $op.text, $r.n);
     }
-    | <assoc=right> names+=NAME '=' exprs+=expression (',' names+=NAME '=' exprs+=expression)* {
-        $n = new Assignment(new VariableAccess($NAME.text), $expression.n);
+    | <assoc=right> l=expression '=' r=expression {
+        $n = new Assignment($ctx, $l.n, $r.n);
     }
     ;
 
 type
 returns [TypeNode n]
     : 'int' {
-        $n = new TypeNode("int");
+        $n = new TypeNode($ctx, PrimitiveType.Int);
     }
     | 'double' {
-        $n = new TypeNode("double");
+        $n = new TypeNode($ctx, PrimitiveType.Double);
     }
     | 'boolean' {
-        $n = new TypeNode("boolean");
+        $n = new TypeNode($ctx, PrimitiveType.Boolean);
     }
     | NAME {
-        $n = new TypeNode($NAME.text);
+        $n = new TypeNode($ctx, new ClassType($NAME.text));
     }
     ;
 

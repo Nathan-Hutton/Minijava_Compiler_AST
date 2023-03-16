@@ -1,5 +1,8 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import edu.westminstercollege.cmpt355.minijava.*;
+
 import java.util.List;
 
 public sealed interface Node
@@ -14,4 +17,8 @@ public sealed interface Node
     }
 
     List<? extends Node> children();
+
+    ParserRuleContext ctx();
+
+    void typecheck(SymbolTable symbols) throws SyntaxException;
 }
