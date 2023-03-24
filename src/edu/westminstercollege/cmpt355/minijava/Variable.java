@@ -6,9 +6,8 @@ public class Variable {
     private int index;
     private Type type;
 
-    public Variable(String name, int index) {
+    public Variable(String name) {
         this.name = name;
-        this.index = index;
     }
 
     public Type getType() {
@@ -27,5 +26,9 @@ public class Variable {
     }
     public int getIndex() {
         return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

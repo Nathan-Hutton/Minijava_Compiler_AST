@@ -23,6 +23,6 @@ public record Negate(ParserRuleContext ctx, Expression expression) implements Ex
     }
     @Override
     public Type getType(SymbolTable symbols) {
-        return PrimitiveType.Boolean;
+        return expression.getType(symbols);
     }
 }

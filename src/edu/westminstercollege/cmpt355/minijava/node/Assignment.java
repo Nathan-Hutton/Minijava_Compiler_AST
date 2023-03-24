@@ -28,6 +28,6 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
     }
     @Override
     public Type getType(SymbolTable symbols) {
-        return VoidType.Instance;
+        return variable.getType(symbols);
     }
 }

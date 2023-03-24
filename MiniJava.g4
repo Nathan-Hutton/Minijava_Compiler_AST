@@ -89,8 +89,8 @@ returns [Expression n]
     | '(' expression ')' {
         $n = $expression.n;
     }
-    | expression op=('++' | '--') {
-        $n = new PostIncrement($ctx, new VariableAccess($ctx, $expression.text), $op.text);
+    | expr=expression op=('++' | '--') {
+        $n = new PostIncrement($ctx, new VariableAccess($ctx, $expr.text), $op.text);
     }
     | op=('++' | '--' | '+' | '-') expression {
         if ($op.text.equals("++") || $op.text.equals("--"))

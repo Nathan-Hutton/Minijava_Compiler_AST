@@ -440,6 +440,7 @@ public class MiniJavaParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExpressionContext extends ParserRuleContext {
 		public Expression n;
+		public ExpressionContext expr;
 		public ExpressionContext l;
 		public ExpressionContext expression;
 		public List<ExpressionContext> exprs = new ArrayList<ExpressionContext>();
@@ -715,6 +716,7 @@ public class MiniJavaParser extends Parser {
 					case 4:
 						{
 						_localctx = new ExpressionContext(_parentctx, _parentState);
+						_localctx.expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(123);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
@@ -730,7 +732,7 @@ public class MiniJavaParser extends Parser {
 							consume();
 						}
 
-						                  ((ExpressionContext)_localctx).n =  new PostIncrement(_localctx, new VariableAccess(_localctx, (((ExpressionContext)_localctx).expression!=null?_input.getText(((ExpressionContext)_localctx).expression.start,((ExpressionContext)_localctx).expression.stop):null)), (((ExpressionContext)_localctx).op!=null?((ExpressionContext)_localctx).op.getText():null));
+						                  ((ExpressionContext)_localctx).n =  new PostIncrement(_localctx, new VariableAccess(_localctx, (((ExpressionContext)_localctx).expr!=null?_input.getText(((ExpressionContext)_localctx).expr.start,((ExpressionContext)_localctx).expr.stop):null)), (((ExpressionContext)_localctx).op!=null?((ExpressionContext)_localctx).op.getText():null));
 						              
 						}
 						break;

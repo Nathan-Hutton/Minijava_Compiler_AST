@@ -33,9 +33,7 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
             throw new SyntaxException(this, String.format("Can't use %s with %s and %s", operator, leftType, rightType));
 
         // Adding numbers with numbers, strings with strings, and numbers with strings
-        if ((leftType == PrimitiveType.Int || leftType == PrimitiveType.Double ||
-                leftType.equals(new ClassType("String"))) && (rightType == PrimitiveType.Int ||
-                rightType == PrimitiveType.Double || rightType.equals(new ClassType("String"))))
+        if (leftType.equals(new ClassType("String")) || rightType.equals(new ClassType("String")))
             return;
 
         throw new SyntaxException(this, String.format("Can't use %s with %s and %s", operator, leftType, rightType));
@@ -45,6 +43,9 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
     public Type getType(SymbolTable symbols) {
         Type leftType = expr1.getType(symbols);
         Type rightType = expr2.getType(symbols);
+
+        if (leftType.equals(new ClassType("String")) || rightType.equals(new ClassType("String")))
+            return new ClassType("String");
 
         if (leftType.equals(PrimitiveType.Double) || rightType.equals(PrimitiveType.Double))
             return PrimitiveType.Double;

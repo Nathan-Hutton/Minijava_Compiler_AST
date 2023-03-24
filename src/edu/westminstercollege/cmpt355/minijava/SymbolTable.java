@@ -7,12 +7,12 @@ import java.util.Optional;
 public class SymbolTable {
 
     private Map<String, Variable> variables = new HashMap<>();
-    private int variableIndex = 1;
+    private int variableIndex = 0;
 
     public Variable registerVariable(String name) {
         Variable v = variables.get(name);
         if (v == null) {
-            v = new Variable(name, variableIndex);
+            v = new Variable(name);
             variableIndex += 2;
             variables.put(name, v);
         }
@@ -27,4 +27,10 @@ public class SymbolTable {
     public int getVariableCount() {
         return variables.size();
     }
+    public int allocateLocalVariable(int size) {
+        int temp = variableIndex;
+        variableIndex += size;
+        return temp;
+    }
+
 }
