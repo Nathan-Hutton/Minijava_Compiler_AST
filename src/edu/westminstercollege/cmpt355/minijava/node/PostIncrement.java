@@ -6,6 +6,7 @@ import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, String op) implements Expression {
@@ -17,6 +18,11 @@ public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, Stri
     @Override
     public String getNodeDescription() {
         return String.format("PostIncrement: %s", op);
+    }
+
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+
     }
 
     @Override

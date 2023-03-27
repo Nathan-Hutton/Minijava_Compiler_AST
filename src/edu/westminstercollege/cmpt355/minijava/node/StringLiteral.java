@@ -6,6 +6,7 @@ import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record StringLiteral(ParserRuleContext ctx, String text) implements Expression {
@@ -20,6 +21,11 @@ public record StringLiteral(ParserRuleContext ctx, String text) implements Expre
     @Override
     public String getNodeDescription() {
         return String.format("StringLiteral: %s", text);
+    }
+
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+        out.printf("ldc %s\n", text);
     }
 
     @Override

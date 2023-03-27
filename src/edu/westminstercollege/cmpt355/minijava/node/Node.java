@@ -3,6 +3,7 @@ package edu.westminstercollege.cmpt355.minijava.node;
 import org.antlr.v4.runtime.ParserRuleContext;
 import edu.westminstercollege.cmpt355.minijava.*;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public sealed interface Node
@@ -21,4 +22,5 @@ public sealed interface Node
     ParserRuleContext ctx();
 
     void typecheck(SymbolTable symbols) throws SyntaxException;
+    void generateCode(PrintWriter out, SymbolTable symbols);
 }

@@ -3,6 +3,7 @@ package edu.westminstercollege.cmpt355.minijava.node;
 import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator, Expression expr2) implements Expression {
@@ -14,6 +15,68 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
     @Override
     public String getNodeDescription() {
         return String.format("BinaryOp: %s", operator);
+    }
+
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+        Type left_type = expr1.getType(symbols);
+        Type right_type = expr2.getType(symbols);
+
+        if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Double) {
+            expr1.generateCode(out, symbols);
+            out.println("i2d");
+            expr2.generateCode(out, symbols);
+        }
+        else if (left_type == PrimitiveType.Double && right_type == PrimitiveType.Int) {
+            expr1.generateCode(out, symbols);
+            expr2.generateCode(out, symbols);
+            out.println("i2d");
+        }
+        else {
+            expr1.generateCode(out, symbols);
+            expr2.generateCode(out, symbols);
+        }
+
+        switch (operator) {
+            case "+" -> generateCodeAdd(out, left_type, right_type);
+            case "-" -> generateCodeSub(out, left_type, right_type);
+            case "*" -> generateCodeMul(out, left_type, right_type);
+            case "/" -> generateCodeDiv(out, left_type, right_type);
+            case "%" -> generateCodeMod(out, left_type, right_type);
+        }
+    }
+
+    public void generateCodeAdd(PrintWriter out, Type left_type, Type right_type) {
+        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)
+            out.println("dadd");
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int)
+            out.println("iadd");
+    }
+    public void generateCodeSub(PrintWriter out, Type left_type, Type right_type) {
+        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)
+            out.println("dsub");
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int)
+            out.println("isub");
+    }
+    public void generateCodeMul(PrintWriter out, Type left_type, Type right_type) {
+        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)
+            out.println("dmul");
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int)
+            out.println("imul");
+    }
+    public void generateCodeDiv(PrintWriter out, Type left_type, Type right_type) {
+        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)
+            out.println("ddiv");
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int)
+            out.println("idiv");
+    }
+    public void generateCodeMod(PrintWriter out, Type left_type, Type right_type) {
+        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double) {
+            out.println("drem");
+        }
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int) {
+            out.println("irem");
+        }
     }
 
     @Override

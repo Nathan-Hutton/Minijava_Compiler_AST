@@ -6,6 +6,7 @@ import edu.westminstercollege.cmpt355.minijava.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 import edu.westminstercollege.cmpt355.minijava.*;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record VariableAccess(ParserRuleContext ctx, String name) implements Expression {
@@ -27,6 +28,19 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
     public void typecheck(SymbolTable symbols) throws SyntaxException {
         if (symbols.findVariable(name).isEmpty())
             throw new SyntaxException(this, String.format("%s doesn't exist", name));
+    }
+
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+        Type type = symbols.findVariable(name).orElseThrow().getType();
+        int index = symbols.findVariable(name).orElseThrow().getIndex();
+
+        if (type == PrimitiveType.Int || type == PrimitiveType.Boolean)
+            out.printf("iload %d\n", index);
+        else if (type == PrimitiveType.Double)
+            out.printf("dload %d\n", index);
+        else
+            out.printf("aload %d\n", index);
     }
 
     @Override

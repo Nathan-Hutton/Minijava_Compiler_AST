@@ -6,6 +6,7 @@ import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record DoubleLiteral(ParserRuleContext ctx, double number) implements Expression {
@@ -23,7 +24,10 @@ public record DoubleLiteral(ParserRuleContext ctx, double number) implements Exp
     public void typecheck(SymbolTable symbols) throws SyntaxException {
         // None
     }
-
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+        out.printf("ldc2_w %f\n", number);
+    }
     @Override
     public Type getType(SymbolTable symbols) {
         return PrimitiveType.Double;

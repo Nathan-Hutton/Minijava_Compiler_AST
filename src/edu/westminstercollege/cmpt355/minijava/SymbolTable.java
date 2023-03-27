@@ -13,7 +13,6 @@ public class SymbolTable {
         Variable v = variables.get(name);
         if (v == null) {
             v = new Variable(name);
-            variableIndex += 2;
             variables.put(name, v);
         }
 
@@ -25,7 +24,7 @@ public class SymbolTable {
     }
 
     public int getVariableCount() {
-        return variables.size();
+        return variableIndex;
     }
     public int allocateLocalVariable(int size) {
         int temp = variableIndex;

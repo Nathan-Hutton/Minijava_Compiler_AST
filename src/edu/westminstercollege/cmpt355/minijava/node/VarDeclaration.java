@@ -4,6 +4,7 @@ import edu.westminstercollege.cmpt355.minijava.SymbolTable;
 import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record VarDeclaration(ParserRuleContext ctx, String name) implements DeclarationItem {
@@ -17,7 +18,13 @@ public record VarDeclaration(ParserRuleContext ctx, String name) implements Decl
     }
 
     @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+
+    }
+
+    @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
+        symbols.registerVariable(name);
         return;
     }
 }

@@ -21,6 +21,7 @@ public class Compiler {
     public Compiler(Block block, String className) {
         this.block = block;
         this.className = className;
+        symbols.allocateLocalVariable(1);
     }
 
     public void compile(Path outputDir) throws IOException, SyntaxException {
@@ -50,8 +51,10 @@ public class Compiler {
                     """, className);
             out.printf(".method public static main([Ljava/lang/String;)V\n");
             out.printf(".limit stack 100\n");
-            out.printf(".limit locals %d\n", symbols.getVariableCount() * 2 + 1); // + 1 because of args
+            out.printf(".limit locals %d\n", symbols.getVariableCount()); // + 1 because of args
             out.println();
+
+            block.generateCode(out, symbols);
 
             // Generate code for program here 🙂
             // Generate code for each statement of the program

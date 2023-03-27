@@ -3,12 +3,24 @@ package edu.westminstercollege.cmpt355.minijava.node;
 import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) implements Expression {
     @Override
     public List<? extends Node> children() {
         return List.of(type, expression);
+    }
+
+    @Override
+    public void generateCode(PrintWriter out, SymbolTable symbols) {
+        expression.generateCode(out, symbols);
+        Type expr_type = expression.getType(symbols);
+
+        if (type.type() == PrimitiveType.Double && expr_type == PrimitiveType.Int)
+            out.println("i2d");
+        else if (type.type() == PrimitiveType.Int && expr_type == PrimitiveType.Double)
+            out.println("d2i");
     }
 
     @Override

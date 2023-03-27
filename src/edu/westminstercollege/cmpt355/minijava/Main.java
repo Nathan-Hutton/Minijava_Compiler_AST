@@ -4,9 +4,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class Main {
 
@@ -31,6 +30,23 @@ public class Main {
         catch (SyntaxException e){
             int line_num = e.getNode().ctx().start.getLine();
             System.out.println("Error at line " + line_num + "\n" + e.getMessage());
+        }
+        // new stuff for testing
+        try {
+            // Use reflection to find the class that was just compiled
+            var compiledClass = Class.forName(CLASS_NAME);
+            // Find its main() method
+            var compiledMainMethod = compiledClass.getMethod("main", String[].class);
+
+            System.out.printf("——— Running compiled class %s ———\n", CLASS_NAME);
+            // Run the compiled main()
+            compiledMainMethod.invoke(null, new Object[] { new String[0] });
+            System.out.println("——— End of output ———");
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException ex) {
+            System.err.println("Unable to execute newly-compiled program: class or method not found!");
+        } catch (InvocationTargetException ex) {
+            // An exception was thrown by the compiled program (not a compiler problem 🙂)
+            ex.getTargetException().printStackTrace();
         }
     }
     private static String getClassNameFromPath(String path) {
