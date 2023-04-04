@@ -23,11 +23,6 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
     }
 
     @Override
-    public ParserRuleContext ctx() {
-        return null;
-    }
-
-    @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
 
     }

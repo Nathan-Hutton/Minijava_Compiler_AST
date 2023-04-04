@@ -25,11 +25,6 @@ public record ConstructorClass(ParserRuleContext ctx, String className, List<Exp
     }
 
     @Override
-    public ParserRuleContext ctx() {
-        return null;
-    }
-
-    @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
 
     }

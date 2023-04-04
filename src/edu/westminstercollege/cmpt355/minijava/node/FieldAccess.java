@@ -20,11 +20,6 @@ public record FieldAccess(ParserRuleContext ctx, Expression expr, String fieldNa
     }
 
     @Override
-    public ParserRuleContext ctx() {
-        return null;
-    }
-
-    @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
         expr.typecheck(symbols);
 
