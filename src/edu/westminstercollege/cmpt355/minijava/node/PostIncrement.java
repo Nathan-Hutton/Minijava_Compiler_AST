@@ -22,7 +22,34 @@ public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, Stri
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
+        variable.generateCode(out, symbols);
 
+        if (op.equals("++")) {
+            if (variable.getType(symbols) == PrimitiveType.Double) {
+                out.println("dup2");
+                out.println("dconst_1");
+                out.println("dadd");
+                out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+            } else if (variable.getType(symbols) == PrimitiveType.Int) {
+                out.println("dup");
+                out.println("iconst_1");
+                out.println("iadd");
+                out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+            }
+        }
+        else {
+            if (variable.getType(symbols) == PrimitiveType.Double) {
+                out.println("dup2");
+                out.println("dconst_1");
+                out.println("dsub");
+                out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+            } else if (variable.getType(symbols) == PrimitiveType.Int) {
+                out.println("dup");
+                out.println("iconst_1");
+                out.println("isub");
+                out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+            }
+        }
     }
 
     @Override

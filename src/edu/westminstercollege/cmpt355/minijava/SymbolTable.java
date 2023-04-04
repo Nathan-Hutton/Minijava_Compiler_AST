@@ -1,8 +1,6 @@
 package edu.westminstercollege.cmpt355.minijava;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SymbolTable {
 
@@ -31,5 +29,66 @@ public class SymbolTable {
         variableIndex += size;
         return temp;
     }
+    public Optional<Class<?>> findJavaClass(String className) {
+        Optional<Class<?>> first = Reflect.classForName(className);
+        if (first.isPresent())
+            return first;
 
+        Optional<Class<?>> second = Reflect.classForName("java.lang." + className);
+        if (second.isPresent())
+            return second;
+
+        return Reflect.classForName("java.util." + className);
+    }
+    public Optional<Class<?>> classFromType(Type type) {
+        if (type.equals(PrimitiveType.Int))
+            return Optional.of(int.class);
+        else if (type.equals(PrimitiveType.Double))
+            return Optional.of(double.class);
+        else if (type.equals(PrimitiveType.Boolean))
+            return Optional.of(boolean.class);
+        else if (type.equals(VoidType.Instance))
+            return Optional.of(void.class);
+        return findJavaClass(type.toString());
+    }
+    public Optional<Field> findField(ClassType classType, String fieldName) {
+        Optional<Class<?>> clazz = classFromType(classType);
+        if (clazz.isPresent())
+            return Reflect.findField(classFromType(classType).orElseThrow(), fieldName);
+        return Optional.empty();
+    }
+    public Optional<Method> findMethod(ClassType classType, String methodName, List<Type> parameterTypes) {
+        List<Class<?>> javaParameterTypes = new ArrayList<>();
+        for (Type parameterType : parameterTypes) {
+            Optional<Class<?>> javaParameterType = classFromType(parameterType);
+            if (javaParameterType.isPresent()) {
+                javaParameterTypes.add(javaParameterType.get());
+            } else {
+                return Optional.empty();
+            }
+        }
+        Optional<Class<?>> javaClass = findJavaClass(classType.getClassName());
+        if (javaClass.isPresent()) {
+            return Reflect.findMethod(javaClass.get(), methodName, javaParameterTypes);
+        } else {
+            return Optional.empty();
+        }
+    }
+    public Optional<Method> findConstructor(ClassType classType, List<Type> parameterTypes) {
+        List<Class<?>> javaParameterTypes = new ArrayList<>();
+        for (Type parameterType : parameterTypes) {
+            Optional<Class<?>> javaParameterType = classFromType(parameterType);
+            if (javaParameterType.isPresent()) {
+                javaParameterTypes.add(javaParameterType.get());
+            } else {
+                return Optional.empty();
+            }
+        }
+        Optional<Class<?>> javaClass = findJavaClass(classType.getClassName());
+        if (javaClass.isPresent()) {
+            return Reflect.findConstructor(javaClass.get(), javaParameterTypes);
+        } else {
+            return Optional.empty();
+        }
+    }
 }

@@ -87,8 +87,9 @@ public class Compiler {
                         symbols.registerVariable(name);
                 }
                 case VariableAccess(ParserRuleContext ctx, String name) -> {
-                    if (symbols.findVariable(name).isEmpty())
-                        // No variable found
+                    if (symbols.findVariable(name).isPresent())
+                        return;
+                    if (symbols.findJavaClass(name).isEmpty())
                         throw new SyntaxException(node, String.format("Variable used before declaration: %s", name));
                 }
                 case Assignment(ParserRuleContext ctx, Expression variable, Expression c)  -> {

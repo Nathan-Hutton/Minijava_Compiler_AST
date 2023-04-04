@@ -64,7 +64,7 @@ returns [DeclarationItem n]
 
 expression
 returns [Expression n]
-    : 'print' '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
+    : '_print' '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
         var expressions = new ArrayList<Expression>();
         for (var expr : $exprs)
             expressions.add(expr.n);
@@ -102,6 +102,23 @@ returns [Expression n]
     }
     | '(' type ')' expression {
         $n = new Cast($ctx, $type.n, $expression.n);
+    }
+    | e=expression '.' NAME {
+            $n = new FieldAccess($ctx, $e.n, $NAME.text);
+        }
+    | e=expression '.' NAME '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
+        var expressions = new ArrayList<Expression>();
+        for (var expr : $exprs)
+            expressions.add(expr.n);
+
+        $n = new MethodCall($ctx, $e.n, $NAME.text, expressions);
+    }
+    | 'new' NAME '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
+        var expressions = new ArrayList<Expression>();
+        for (var expr : $exprs)
+            expressions.add(expr.n);
+
+        $n = new ConstructorClass($ctx, $NAME.text, expressions);
     }
     | l=expression op=('*' | '/' | '%') r=expression {
         $n = new BinaryOp($ctx, $l.n, $op.text, $r.n);

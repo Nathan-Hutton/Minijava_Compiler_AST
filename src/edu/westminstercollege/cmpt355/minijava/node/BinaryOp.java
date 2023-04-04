@@ -22,6 +22,7 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
         Type left_type = expr1.getType(symbols);
         Type right_type = expr2.getType(symbols);
 
+        // Number adding
         if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Double) {
             expr1.generateCode(out, symbols);
             out.println("i2d");
@@ -31,6 +32,113 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
             expr1.generateCode(out, symbols);
             expr2.generateCode(out, symbols);
             out.println("i2d");
+        }
+
+        // Concatenation
+        else if (left_type.equals(new ClassType("String")) && right_type.equals(new ClassType("String"))) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type.equals(new ClassType("String")) && right_type instanceof ClassType) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("ldc_w \"" + right_type.toString() + "@" + expr2.hashCode() + "\"");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type instanceof ClassType && right_type.equals(new ClassType("String"))) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            out.println("ldc_w \"" + left_type.toString() + "@" + expr1.hashCode() + "\"");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type == PrimitiveType.Int && right_type.equals(new ClassType("String"))) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type.equals(new ClassType("String")) && right_type == PrimitiveType.Int) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type == PrimitiveType.Double && right_type.equals(new ClassType("String"))) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Double/toString(D)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type.equals(new ClassType("String")) && right_type == PrimitiveType.Double) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Double/toString(D)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type.equals(new ClassType("String")) && right_type == PrimitiveType.Boolean) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
+        }
+        else if (left_type == PrimitiveType.Boolean && right_type.equals(new ClassType("String"))) {
+            out.println("new java/lang/StringBuilder");
+            out.println("dup");
+            out.println("invokespecial java/lang/StringBuilder/<init>()V");
+            expr1.generateCode(out, symbols);
+            out.println("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;");
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            expr2.generateCode(out, symbols);
+            out.println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+            out.println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+            return;
         }
         else {
             expr1.generateCode(out, symbols);
@@ -47,10 +155,15 @@ public record BinaryOp(ParserRuleContext ctx, Expression expr1, String operator,
     }
 
     public void generateCodeAdd(PrintWriter out, Type left_type, Type right_type) {
-        if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)
+        if (left_type == PrimitiveType.Double && right_type == PrimitiveType.Double)
+            out.println("dadd");
+        else if (left_type == PrimitiveType.Double && right_type == PrimitiveType.Int)
+            out.println("dadd");
+        else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Double)
             out.println("dadd");
         else if (left_type == PrimitiveType.Int && right_type == PrimitiveType.Int)
             out.println("iadd");
+
     }
     public void generateCodeSub(PrintWriter out, Type left_type, Type right_type) {
         if (left_type == PrimitiveType.Double || right_type == PrimitiveType.Double)

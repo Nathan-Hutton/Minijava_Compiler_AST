@@ -3,13 +3,22 @@ package edu.westminstercollege.cmpt355.minijava;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String... args) throws IOException, SyntaxException {
+//        SymbolTable symbols = new SymbolTable();
+//        System.out.println(symbols.findConstructor(new ClassType(""), List.of()));
+//        System.out.println(symbols.findMethod(new ClassType("java.lang.String"), "toLowerCase", List.of()));
+//        System.out.println(symbols.findField(new ClassType("Math"), "pie"));
+
         final String TEST_FILE = "test_programs/test1.txt";
         final String CLASS_NAME = getClassNameFromPath(TEST_FILE);
 

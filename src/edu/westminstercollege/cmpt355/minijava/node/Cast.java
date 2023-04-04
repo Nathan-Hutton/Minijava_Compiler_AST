@@ -21,6 +21,14 @@ public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) 
             out.println("i2d");
         else if (type.type() == PrimitiveType.Int && expr_type == PrimitiveType.Double)
             out.println("d2i");
+        else if (type.type().equals(new ClassType("String")) && expr_type == PrimitiveType.Int)
+            out.println("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;");
+        else if (type.type().equals(new ClassType("String")) && expr_type == PrimitiveType.Double)
+            out.println("invokestatic java/lang/Double/toString(D)Ljava/lang/String;");
+        else if (type.type().equals(new ClassType("String")) && expr_type == PrimitiveType.Boolean)
+            out.println("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;");
+        else if (type.type().equals(new ClassType("String")) && expr_type == PrimitiveType.Int)
+            out.println("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;");
     }
 
     @Override

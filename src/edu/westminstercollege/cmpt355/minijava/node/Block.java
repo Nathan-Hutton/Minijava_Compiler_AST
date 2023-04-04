@@ -16,7 +16,6 @@ public record Block(ParserRuleContext ctx, List<Statement> statements) implement
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
         for (Statement child : statements) {
-//            out.println("// " + (child.ctx().start.getLine()));
             child.generateCode(out, symbols);
         }
     }

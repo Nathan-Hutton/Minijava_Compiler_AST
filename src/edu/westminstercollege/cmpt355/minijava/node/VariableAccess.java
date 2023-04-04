@@ -3,11 +3,13 @@ package edu.westminstercollege.cmpt355.minijava.node;
 import edu.westminstercollege.cmpt355.minijava.SymbolTable;
 import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
+import jas.Var;
 import org.antlr.v4.runtime.ParserRuleContext;
 import edu.westminstercollege.cmpt355.minijava.*;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 public record VariableAccess(ParserRuleContext ctx, String name) implements Expression {
     @Override
@@ -25,15 +27,17 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {
-        if (symbols.findVariable(name).isEmpty())
-            throw new SyntaxException(this, String.format("%s doesn't exist", name));
-    }
+    public void typecheck(SymbolTable symbols) throws SyntaxException {}
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
-        Type type = symbols.findVariable(name).orElseThrow().getType();
-        int index = symbols.findVariable(name).orElseThrow().getIndex();
+        Type type = getType(symbols);
+
+        Optional<Variable> variable = symbols.findVariable(name);
+        if (variable.isEmpty())
+            return;
+
+        int index = variable.orElseThrow().getIndex();
 
         if (type == PrimitiveType.Int || type == PrimitiveType.Boolean)
             out.printf("iload %d\n", index);
@@ -45,6 +49,10 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
 
     @Override
     public Type getType(SymbolTable symbols) {
-        return symbols.findVariable(name).orElseThrow().getType();
+        if (symbols.findVariable(name).isPresent())
+            return symbols.findVariable(name).orElseThrow().getType();
+        if (symbols.findJavaClass(name).isPresent())
+            return new StaticType(name);
+        return null;
     }
 }
