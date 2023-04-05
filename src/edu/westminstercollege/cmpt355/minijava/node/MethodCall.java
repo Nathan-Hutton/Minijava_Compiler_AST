@@ -36,15 +36,15 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
         String source_class_name = symbols.findJavaClass(expr.getType(symbols).toString()).orElseThrow().getName();
 
         Optional<Method> method = symbols.findMethod(((ClassType) expr.getType(symbols)) , methodName, mini_param_types);
-        if (method.orElseThrow().returnType() instanceof StaticType) {
-            generateCodeStatic(out, source_class_name, method.orElseThrow().returnType(), mini_param_types);
+        if (method.orElseThrow().containingType() instanceof StaticType) {
+            generateCodeStatic(out, symbols, source_class_name, method.orElseThrow().returnType(), mini_param_types);
             return;
         }
 
 
-        generateCodeNonstatic(out, source_class_name, method.orElseThrow().returnType(), mini_param_types);
+        generateCodeNonstatic(out, symbols, source_class_name, method.orElseThrow().returnType(), mini_param_types);
     }
-    public void generateCodeStatic(PrintWriter out, String source_class_name, Type returnType, List<Type> mini_param_types)
+    public void generateCodeStatic(PrintWriter out, SymbolTable symbols, String source_class_name, Type returnType, List<Type> mini_param_types)
     {
         StringBuilder type_string = new StringBuilder();
         for (Type t : mini_param_types) {
@@ -55,31 +55,46 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
             else if (t == PrimitiveType.Boolean)
                 type_string.append("Z");
             else if (t instanceof ClassType)
-                type_string.append("L").append(t.toString().replace('.', '/')).append(";");
+                type_string.append("L").append(symbols.classFromType(t).orElseThrow().getName().replace('.', '/')).append(";");
         }
 
         if (returnType instanceof VoidType)
             out.printf("invokestatic %s/%s(%s)V\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Int)
-            out.printf("invokestatic %s/%s(%s)\n", source_class_name, methodName, "I");
+            out.printf("invokestatic %s/%s(%s)I\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Double)
-            out.printf("invokestatic %s/%s(%s)\n", source_class_name, methodName, "D");
+            out.printf("invokestatic %s/%s(%s)D\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Boolean)
-            out.printf("invokestatic %s/%s(%s)\n", source_class_name, methodName, "Z");
-        else if (returnType instanceof ClassType classType) {
-            out.printf("invokestatic %s/%s(L%s);\n", source_class_name, methodName, classType.toString().replace('.', '/'));
+            out.printf("invokestatic %s/%s(%s)Z\n", source_class_name, methodName, type_string);
+        else if (returnType instanceof ClassType) {
+            out.printf("invokestatic %s/%s(%s)L%s;\n", source_class_name, methodName, type_string, returnType.toString().replace('.', '/'));
         }
     }
-    public void generateCodeNonstatic(PrintWriter out, String source_class_name, Type returnType, List<Type> mini_param_types)
+    public void generateCodeNonstatic(PrintWriter out, SymbolTable symbols, String source_class_name, Type returnType, List<Type> mini_param_types)
     {
-        if (returnType == PrimitiveType.Int)
-            out.printf("getfield %s/%s(%s)\n", source_class_name, methodName, "I");
+        StringBuilder type_string = new StringBuilder();
+        for (Type t : mini_param_types) {
+            if (t == PrimitiveType.Int)
+                type_string.append("I");
+            else if (t == PrimitiveType.Double)
+                type_string.append("D");
+            else if (t == PrimitiveType.Boolean)
+                type_string.append("Z");
+            else if (t instanceof ClassType)
+                type_string.append("L").append(symbols.classFromType(t).orElseThrow().getName().replace('.', '/')).append(";");
+        }
+
+        if (returnType instanceof VoidType)
+            out.printf("invokevirtual %s/%s(%s)V\n", source_class_name, methodName, type_string);
+        else if (returnType == PrimitiveType.Int)
+            out.printf("invokevirtual %s/%s(%s)I\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Double)
-            out.printf("getfield %s/%s(%s)\n", source_class_name, methodName, "D");
+            out.printf("invokevirtual %s/%s(%s)D\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Boolean)
-            out.printf("getfield %s/%s(%s)\n", source_class_name, methodName, "Z");
-        else if (returnType instanceof ClassType classType)
-            out.printf("getfield %s/%s(L%s);\n", source_class_name, methodName, classType.toString().replace('.', '/'));
+            out.printf("invokevirtual %s/%s(%s)Z\n", source_class_name, methodName, type_string);
+        else if (returnType instanceof ClassType) {
+            out.printf("invokevirtual %s/%s(%s)L%s;\n", source_class_name, methodName, type_string, returnType.toString().replace('.', '/'));
+        }
     }
 
     @Override

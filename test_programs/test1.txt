@@ -1,1 +1,1 @@
-_print(Math.sqrt(5.0));
+_print(new String("hello")); // hello

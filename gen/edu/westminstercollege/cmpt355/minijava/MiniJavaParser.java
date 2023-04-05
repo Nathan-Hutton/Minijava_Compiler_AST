@@ -2,15 +2,12 @@
 package edu.westminstercollege.cmpt355.minijava;
 
 import edu.westminstercollege.cmpt355.minijava.node.*;
-import edu.westminstercollege.cmpt355.minijava.Type;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
-import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
@@ -680,7 +677,7 @@ public class MiniJavaParser extends Parser {
 				        for (var expr : ((ExpressionContext)_localctx).exprs)
 				            expressions.add(expr.n);
 
-				        ((ExpressionContext)_localctx).n =  new ConstructorClass(_localctx, (((ExpressionContext)_localctx).NAME!=null?((ExpressionContext)_localctx).NAME.getText():null), expressions);
+				        ((ExpressionContext)_localctx).n =  new ConstructorCall(_localctx, (((ExpressionContext)_localctx).NAME!=null?((ExpressionContext)_localctx).NAME.getText():null), expressions);
 				    
 				}
 				break;
