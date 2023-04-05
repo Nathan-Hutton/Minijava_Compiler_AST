@@ -1,1 +1,1 @@
-_print(Math.sqrt(5));
+_print(Math.sqrt(5.0));
