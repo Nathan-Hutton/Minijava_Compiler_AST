@@ -23,7 +23,8 @@ public record ConstructorCall(ParserRuleContext ctx, String className, List<Expr
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
-        out.printf("new %s", className);
+        out.printf("new %s\n", symbols.findJavaClass(className).orElseThrow().getName().replace('.', '/'));
+        out.println("dup");
 
         List<Type> mini_param_types = new ArrayList<>();
         for (Expression arg : arguments) {
@@ -43,18 +44,20 @@ public record ConstructorCall(ParserRuleContext ctx, String className, List<Expr
                 type_string.append("L").append(symbols.classFromType(t).orElseThrow().getName().replace('.', '/')).append(";");
         }
 
-        out.printf("invokespecial MyClass/<init>(%s)V;", type_string);
+        out.printf("invokespecial %s/<init>(%s)V\n", symbols.findJavaClass(className).orElseThrow().getName().replace('.', '/'), type_string);
     }
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-        if (!(getType(symbols) instanceof ClassType))
-            throw new SyntaxException(this, String.format("%s is not a class type", className));
-
         List<Type> mini_param_types = new ArrayList<>();
         for (Expression arg : arguments) {
             arg.typecheck(symbols);
             mini_param_types.add(arg.getType(symbols));
         }
+
+        if (!(getType(symbols) instanceof ClassType)) {
+            throw new SyntaxException(this, String.format("%s is not a class type", className));
+        }
+
 
         Optional<Method> constructor = symbols.findConstructor(new ClassType(className), mini_param_types);
         if (constructor.isEmpty())

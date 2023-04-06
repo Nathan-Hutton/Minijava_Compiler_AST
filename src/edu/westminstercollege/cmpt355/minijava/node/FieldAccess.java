@@ -34,9 +34,8 @@ public record FieldAccess(ParserRuleContext ctx, Expression expr, String fieldNa
 
         if (expr_type instanceof ClassType class_type) {
             Optional<Field> field = symbols.findField(class_type, fieldName);
-            if (field.isPresent()) {
+            if (field.isPresent())
                 return field.get().type();
-            }
         }
         return null;
     }

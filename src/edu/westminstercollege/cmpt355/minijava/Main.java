@@ -14,11 +14,6 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String... args) throws IOException, SyntaxException {
-//        SymbolTable symbols = new SymbolTable();
-//        System.out.println(symbols.findConstructor(new ClassType(""), List.of()));
-//        System.out.println(symbols.findMethod(new ClassType("java.lang.String"), "toLowerCase", List.of()));
-//        System.out.println(symbols.findField(new ClassType("Math"), "pie"));
-
         final String TEST_FILE = "test_programs/test1.txt";
         final String CLASS_NAME = getClassNameFromPath(TEST_FILE);
 

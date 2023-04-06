@@ -10,6 +10,7 @@ import javax.swing.plaf.nimbus.State;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public record VarDeclarations(ParserRuleContext ctx, TypeNode type, List<DeclarationItem> declarations) implements Statement {
     @Override
@@ -55,8 +56,21 @@ public record VarDeclarations(ParserRuleContext ctx, TypeNode type, List<Declara
                 }
             }
 
-            if (!type.type().equals((expression.getType(symbols))))
+//            if (symbols.classFromType(type.type()).equals(symbols.classFromType(expression.getType(symbols))))
+//                return;
+
+            if (!type.type().equals(expression.getType(symbols))) {
+                Optional<Class<?>> clazz = symbols.classFromType(type.type());
+                if (clazz.isPresent()) {
+                    if (clazz.orElseThrow().getName().equals(expression.getType(symbols).toString())) {
+                        Variable v = symbols.findVariable(item.name()).orElseThrow();
+                        v.setType(type.type());
+                        v.setIndex(symbols.allocateLocalVariable(1));
+                        continue;
+                    }
+                }
                 throw new SyntaxException(this, String.format("%s is not of type %s", expression, type.type()));
+            }
 
             Variable v = symbols.findVariable(item.name()).orElseThrow();
             v.setType(type.type());

@@ -2,12 +2,15 @@
 package edu.westminstercollege.cmpt355.minijava;
 
 import edu.westminstercollege.cmpt355.minijava.node.*;
+import edu.westminstercollege.cmpt355.minijava.Type;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
 import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
@@ -622,55 +625,40 @@ public class MiniJavaParser extends Parser {
 			case 9:
 				{
 				setState(100);
-				match(T__6);
-				setState(101);
-				((ExpressionContext)_localctx).type = type();
-				setState(102);
-				match(T__7);
-				setState(103);
-				((ExpressionContext)_localctx).expression = expression(7);
-
-				        ((ExpressionContext)_localctx).n =  new Cast(_localctx, ((ExpressionContext)_localctx).type.n, ((ExpressionContext)_localctx).expression.n);
-				    
-				}
-				break;
-			case 10:
-				{
-				setState(106);
 				match(T__13);
-				setState(107);
+				setState(101);
 				((ExpressionContext)_localctx).NAME = match(NAME);
-				setState(108);
+				setState(102);
 				match(T__6);
-				setState(117);
+				setState(111);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (((_la) & ~0x3f) == 0 && ((1L << _la) & 260071104L) != 0) {
 					{
-					setState(109);
+					setState(103);
 					((ExpressionContext)_localctx).expression = ((ExpressionContext)_localctx).expression = expression(0);
 					((ExpressionContext)_localctx).exprs.add(((ExpressionContext)_localctx).expression);
-					setState(114);
+					setState(108);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while (_la==T__3) {
 						{
 						{
-						setState(110);
+						setState(104);
 						match(T__3);
-						setState(111);
+						setState(105);
 						((ExpressionContext)_localctx).expression = ((ExpressionContext)_localctx).expression = expression(0);
 						((ExpressionContext)_localctx).exprs.add(((ExpressionContext)_localctx).expression);
 						}
 						}
-						setState(116);
+						setState(110);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
 					}
 				}
 
-				setState(119);
+				setState(113);
 				match(T__7);
 
 				        var expressions = new ArrayList<Expression>();
@@ -678,6 +666,21 @@ public class MiniJavaParser extends Parser {
 				            expressions.add(expr.n);
 
 				        ((ExpressionContext)_localctx).n =  new ConstructorCall(_localctx, (((ExpressionContext)_localctx).NAME!=null?((ExpressionContext)_localctx).NAME.getText():null), expressions);
+				    
+				}
+				break;
+			case 10:
+				{
+				setState(115);
+				match(T__6);
+				setState(116);
+				((ExpressionContext)_localctx).type = type();
+				setState(117);
+				match(T__7);
+				setState(118);
+				((ExpressionContext)_localctx).expression = expression(4);
+
+				        ((ExpressionContext)_localctx).n =  new Cast(_localctx, ((ExpressionContext)_localctx).type.n, ((ExpressionContext)_localctx).expression.n);
 				    
 				}
 				break;
@@ -789,7 +792,7 @@ public class MiniJavaParser extends Parser {
 						_localctx.e = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(141);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(142);
 						match(T__12);
 						setState(143);
@@ -805,7 +808,7 @@ public class MiniJavaParser extends Parser {
 						_localctx.e = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(145);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(146);
 						match(T__12);
 						setState(147);
@@ -962,9 +965,9 @@ public class MiniJavaParser extends Parser {
 		case 3:
 			return precpred(_ctx, 9);
 		case 4:
-			return precpred(_ctx, 6);
+			return precpred(_ctx, 7);
 		case 5:
-			return precpred(_ctx, 5);
+			return precpred(_ctx, 6);
 		}
 		return true;
 	}
@@ -987,34 +990,34 @@ public class MiniJavaParser extends Parser {
 		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
 		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
 		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0005\u0005k\b\u0005\n\u0005\f\u0005n\t"+
+		"\u0005\u0003\u0005p\b\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0003\u0005z\b"+
 		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
-		"\u0005\u0001\u0005\u0001\u0005\u0005\u0005q\b\u0005\n\u0005\f\u0005t\t"+
-		"\u0005\u0003\u0005v\b\u0005\u0001\u0005\u0001\u0005\u0003\u0005z\b\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0005\u0005"+
-		"\u0099\b\u0005\n\u0005\f\u0005\u009c\t\u0005\u0003\u0005\u009e\b\u0005"+
-		"\u0001\u0005\u0001\u0005\u0005\u0005\u00a2\b\u0005\n\u0005\f\u0005\u00a5"+
-		"\t\u0005\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001"+
-		"\u0006\u0001\u0006\u0001\u0006\u0003\u0006\u00af\b\u0006\u0001\u0006\u0000"+
-		"\u0001\n\u0007\u0000\u0002\u0004\u0006\b\n\f\u0000\u0004\u0001\u0000\t"+
-		"\f\u0001\u0000\u000f\u0011\u0001\u0000\u000b\f\u0001\u0000\t\n\u00c8\u0000"+
-		"\u000e\u0001\u0000\u0000\u0000\u0002\u0014\u0001\u0000\u0000\u0000\u0004"+
-		"+\u0001\u0000\u0000\u0000\u0006-\u0001\u0000\u0000\u0000\b@\u0001\u0000"+
-		"\u0000\u0000\ny\u0001\u0000\u0000\u0000\f\u00ae\u0001\u0000\u0000\u0000"+
-		"\u000e\u000f\u0003\u0002\u0001\u0000\u000f\u0010\u0005\u0000\u0000\u0001"+
-		"\u0010\u0001\u0001\u0000\u0000\u0000\u0011\u0013\u0003\u0004\u0002\u0000"+
-		"\u0012\u0011\u0001\u0000\u0000\u0000\u0013\u0016\u0001\u0000\u0000\u0000"+
-		"\u0014\u0012\u0001\u0000\u0000\u0000\u0014\u0015\u0001\u0000\u0000\u0000"+
-		"\u0015\u0017\u0001\u0000\u0000\u0000\u0016\u0014\u0001\u0000\u0000\u0000"+
-		"\u0017\u0018\u0006\u0001\uffff\uffff\u0000\u0018\u0003\u0001\u0000\u0000"+
-		"\u0000\u0019\u001a\u0005\u0001\u0000\u0000\u001a,\u0006\u0002\uffff\uffff"+
-		"\u0000\u001b\u001f\u0005\u0002\u0000\u0000\u001c\u001e\u0003\u0004\u0002"+
-		"\u0000\u001d\u001c\u0001\u0000\u0000\u0000\u001e!\u0001\u0000\u0000\u0000"+
-		"\u001f\u001d\u0001\u0000\u0000\u0000\u001f \u0001\u0000\u0000\u0000 \""+
-		"\u0001\u0000\u0000\u0000!\u001f\u0001\u0000\u0000\u0000\"#\u0005\u0003"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0005"+
+		"\u0005\u0099\b\u0005\n\u0005\f\u0005\u009c\t\u0005\u0003\u0005\u009e\b"+
+		"\u0005\u0001\u0005\u0001\u0005\u0005\u0005\u00a2\b\u0005\n\u0005\f\u0005"+
+		"\u00a5\t\u0005\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006"+
+		"\u0001\u0006\u0001\u0006\u0001\u0006\u0003\u0006\u00af\b\u0006\u0001\u0006"+
+		"\u0000\u0001\n\u0007\u0000\u0002\u0004\u0006\b\n\f\u0000\u0004\u0001\u0000"+
+		"\t\f\u0001\u0000\u000f\u0011\u0001\u0000\u000b\f\u0001\u0000\t\n\u00c8"+
+		"\u0000\u000e\u0001\u0000\u0000\u0000\u0002\u0014\u0001\u0000\u0000\u0000"+
+		"\u0004+\u0001\u0000\u0000\u0000\u0006-\u0001\u0000\u0000\u0000\b@\u0001"+
+		"\u0000\u0000\u0000\ny\u0001\u0000\u0000\u0000\f\u00ae\u0001\u0000\u0000"+
+		"\u0000\u000e\u000f\u0003\u0002\u0001\u0000\u000f\u0010\u0005\u0000\u0000"+
+		"\u0001\u0010\u0001\u0001\u0000\u0000\u0000\u0011\u0013\u0003\u0004\u0002"+
+		"\u0000\u0012\u0011\u0001\u0000\u0000\u0000\u0013\u0016\u0001\u0000\u0000"+
+		"\u0000\u0014\u0012\u0001\u0000\u0000\u0000\u0014\u0015\u0001\u0000\u0000"+
+		"\u0000\u0015\u0017\u0001\u0000\u0000\u0000\u0016\u0014\u0001\u0000\u0000"+
+		"\u0000\u0017\u0018\u0006\u0001\uffff\uffff\u0000\u0018\u0003\u0001\u0000"+
+		"\u0000\u0000\u0019\u001a\u0005\u0001\u0000\u0000\u001a,\u0006\u0002\uffff"+
+		"\uffff\u0000\u001b\u001f\u0005\u0002\u0000\u0000\u001c\u001e\u0003\u0004"+
+		"\u0002\u0000\u001d\u001c\u0001\u0000\u0000\u0000\u001e!\u0001\u0000\u0000"+
+		"\u0000\u001f\u001d\u0001\u0000\u0000\u0000\u001f \u0001\u0000\u0000\u0000"+
+		" \"\u0001\u0000\u0000\u0000!\u001f\u0001\u0000\u0000\u0000\"#\u0005\u0003"+
 		"\u0000\u0000#,\u0006\u0002\uffff\uffff\u0000$%\u0003\u0006\u0003\u0000"+
 		"%&\u0006\u0002\uffff\uffff\u0000&,\u0001\u0000\u0000\u0000\'(\u0003\n"+
 		"\u0005\u0000()\u0005\u0001\u0000\u0000)*\u0006\u0002\uffff\uffff\u0000"+
@@ -1042,18 +1045,18 @@ public class MiniJavaParser extends Parser {
 		"\uffff\u0000[\\\u0005\u0007\u0000\u0000\\]\u0003\n\u0005\u0000]^\u0005"+
 		"\b\u0000\u0000^_\u0006\u0005\uffff\uffff\u0000_z\u0001\u0000\u0000\u0000"+
 		"`a\u0007\u0000\u0000\u0000ab\u0003\n\u0005\bbc\u0006\u0005\uffff\uffff"+
-		"\u0000cz\u0001\u0000\u0000\u0000de\u0005\u0007\u0000\u0000ef\u0003\f\u0006"+
-		"\u0000fg\u0005\b\u0000\u0000gh\u0003\n\u0005\u0007hi\u0006\u0005\uffff"+
-		"\uffff\u0000iz\u0001\u0000\u0000\u0000jk\u0005\u000e\u0000\u0000kl\u0005"+
-		"\u001b\u0000\u0000lu\u0005\u0007\u0000\u0000mr\u0003\n\u0005\u0000no\u0005"+
-		"\u0004\u0000\u0000oq\u0003\n\u0005\u0000pn\u0001\u0000\u0000\u0000qt\u0001"+
-		"\u0000\u0000\u0000rp\u0001\u0000\u0000\u0000rs\u0001\u0000\u0000\u0000"+
-		"sv\u0001\u0000\u0000\u0000tr\u0001\u0000\u0000\u0000um\u0001\u0000\u0000"+
-		"\u0000uv\u0001\u0000\u0000\u0000vw\u0001\u0000\u0000\u0000wx\u0005\b\u0000"+
-		"\u0000xz\u0006\u0005\uffff\uffff\u0000yB\u0001\u0000\u0000\u0000yQ\u0001"+
+		"\u0000cz\u0001\u0000\u0000\u0000de\u0005\u000e\u0000\u0000ef\u0005\u001b"+
+		"\u0000\u0000fo\u0005\u0007\u0000\u0000gl\u0003\n\u0005\u0000hi\u0005\u0004"+
+		"\u0000\u0000ik\u0003\n\u0005\u0000jh\u0001\u0000\u0000\u0000kn\u0001\u0000"+
+		"\u0000\u0000lj\u0001\u0000\u0000\u0000lm\u0001\u0000\u0000\u0000mp\u0001"+
+		"\u0000\u0000\u0000nl\u0001\u0000\u0000\u0000og\u0001\u0000\u0000\u0000"+
+		"op\u0001\u0000\u0000\u0000pq\u0001\u0000\u0000\u0000qr\u0005\b\u0000\u0000"+
+		"rz\u0006\u0005\uffff\uffff\u0000st\u0005\u0007\u0000\u0000tu\u0003\f\u0006"+
+		"\u0000uv\u0005\b\u0000\u0000vw\u0003\n\u0005\u0004wx\u0006\u0005\uffff"+
+		"\uffff\u0000xz\u0001\u0000\u0000\u0000yB\u0001\u0000\u0000\u0000yQ\u0001"+
 		"\u0000\u0000\u0000yS\u0001\u0000\u0000\u0000yU\u0001\u0000\u0000\u0000"+
 		"yW\u0001\u0000\u0000\u0000yY\u0001\u0000\u0000\u0000y[\u0001\u0000\u0000"+
-		"\u0000y`\u0001\u0000\u0000\u0000yd\u0001\u0000\u0000\u0000yj\u0001\u0000"+
+		"\u0000y`\u0001\u0000\u0000\u0000yd\u0001\u0000\u0000\u0000ys\u0001\u0000"+
 		"\u0000\u0000z\u00a3\u0001\u0000\u0000\u0000{|\n\u0003\u0000\u0000|}\u0007"+
 		"\u0001\u0000\u0000}~\u0003\n\u0005\u0004~\u007f\u0006\u0005\uffff\uffff"+
 		"\u0000\u007f\u00a2\u0001\u0000\u0000\u0000\u0080\u0081\n\u0002\u0000\u0000"+
@@ -1063,9 +1066,9 @@ public class MiniJavaParser extends Parser {
 		"\u0088\u0003\n\u0005\u0001\u0088\u0089\u0006\u0005\uffff\uffff\u0000\u0089"+
 		"\u00a2\u0001\u0000\u0000\u0000\u008a\u008b\n\t\u0000\u0000\u008b\u008c"+
 		"\u0007\u0003\u0000\u0000\u008c\u00a2\u0006\u0005\uffff\uffff\u0000\u008d"+
-		"\u008e\n\u0006\u0000\u0000\u008e\u008f\u0005\r\u0000\u0000\u008f\u0090"+
+		"\u008e\n\u0007\u0000\u0000\u008e\u008f\u0005\r\u0000\u0000\u008f\u0090"+
 		"\u0005\u001b\u0000\u0000\u0090\u00a2\u0006\u0005\uffff\uffff\u0000\u0091"+
-		"\u0092\n\u0005\u0000\u0000\u0092\u0093\u0005\r\u0000\u0000\u0093\u0094"+
+		"\u0092\n\u0006\u0000\u0000\u0092\u0093\u0005\r\u0000\u0000\u0093\u0094"+
 		"\u0005\u001b\u0000\u0000\u0094\u009d\u0005\u0007\u0000\u0000\u0095\u009a"+
 		"\u0003\n\u0005\u0000\u0096\u0097\u0005\u0004\u0000\u0000\u0097\u0099\u0003"+
 		"\n\u0005\u0000\u0098\u0096\u0001\u0000\u0000\u0000\u0099\u009c\u0001\u0000"+
@@ -1086,7 +1089,7 @@ public class MiniJavaParser extends Parser {
 		"\u0006\u0006\uffff\uffff\u0000\u00ae\u00a6\u0001\u0000\u0000\u0000\u00ae"+
 		"\u00a8\u0001\u0000\u0000\u0000\u00ae\u00aa\u0001\u0000\u0000\u0000\u00ae"+
 		"\u00ac\u0001\u0000\u0000\u0000\u00af\r\u0001\u0000\u0000\u0000\u000f\u0014"+
-		"\u001f+3@JMruy\u009a\u009d\u00a1\u00a3\u00ae";
+		"\u001f+3@JMloy\u009a\u009d\u00a1\u00a3\u00ae";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

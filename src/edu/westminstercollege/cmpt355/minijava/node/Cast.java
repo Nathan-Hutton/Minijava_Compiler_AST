@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) implements Expression {
     @Override
@@ -29,6 +30,10 @@ public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) 
             out.println("invokestatic java/lang/Boolean/toString(Z)Ljava/lang/String;");
         else if (type.type().equals(new ClassType("String")) && expr_type == PrimitiveType.Int)
             out.println("invokestatic java/lang/Integer/toString(I)Ljava/lang/String;");
+        else if (type.type().equals(new ClassType("String")) && expr_type instanceof ClassType) {
+            Optional<Class<?>> clazz = symbols.classFromType(expr_type);
+            clazz.ifPresent(aClass -> out.printf("invokevirtual %s/toString()Ljava/lang/String;\n", aClass.getName().replace('.', '/')));
+        }
     }
 
     @Override
@@ -36,6 +41,7 @@ public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) 
         expression.typecheck(symbols);
         type.typecheck(symbols);
 
+        System.out.println(expression.getClass());
         Type expression_type = expression.getType(symbols);
         Type cast_type = type.type();
 
@@ -62,6 +68,9 @@ public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) 
         if (expression_type.equals(new ClassType("char")))
             if (cast_type.equals(new ClassType("String")))
                 return;
+
+        if (type.type() instanceof ClassType && type.type().equals(new ClassType("String")))
+            return;
 
         throw new SyntaxException(this, String.format("Can't convert %s to %s", expression_type, cast_type));
     }

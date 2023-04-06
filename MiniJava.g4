@@ -100,9 +100,6 @@ returns [Expression n]
         else if ($op.text.equals("+"))
             $n = $expression.n;
     }
-    | '(' type ')' expression {
-        $n = new Cast($ctx, $type.n, $expression.n);
-    }
     | e=expression '.' NAME {
             $n = new FieldAccess($ctx, $e.n, $NAME.text);
         }
@@ -118,7 +115,10 @@ returns [Expression n]
         for (var expr : $exprs)
             expressions.add(expr.n);
 
-        $n = new ConstructorClass($ctx, $NAME.text, expressions);
+        $n = new ConstructorCall($ctx, $NAME.text, expressions);
+    }
+    | '(' type ')' expression {
+        $n = new Cast($ctx, $type.n, $expression.n);
     }
     | l=expression op=('*' | '/' | '%') r=expression {
         $n = new BinaryOp($ctx, $l.n, $op.text, $r.n);

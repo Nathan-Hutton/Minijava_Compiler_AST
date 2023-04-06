@@ -49,8 +49,9 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
 
     @Override
     public Type getType(SymbolTable symbols) {
-        if (symbols.findVariable(name).isPresent())
+        if (symbols.findVariable(name).isPresent()) {
             return symbols.findVariable(name).orElseThrow().getType();
+        }
         if (symbols.findJavaClass(name).isPresent())
             return new StaticType(name);
         return null;

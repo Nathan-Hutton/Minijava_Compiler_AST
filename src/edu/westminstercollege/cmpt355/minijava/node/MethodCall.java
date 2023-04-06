@@ -99,13 +99,16 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-        if (!(expr.getType(symbols) instanceof ClassType))
-            throw new SyntaxException(this, String.format("%s is not a classtype", expr));
+        expr.typecheck(symbols);
 
         List<Type> mini_param_types = new ArrayList<>();
         for (Expression arg : arguments) {
             arg.typecheck(symbols);
             mini_param_types.add(arg.getType(symbols));
+        }
+
+        if (!(expr.getType(symbols) instanceof ClassType)) {
+            throw new SyntaxException(this, String.format("%s is not a classtype", expr.getType(symbols)));
         }
 
         if (expr.getType(symbols) instanceof ClassType classType) {
