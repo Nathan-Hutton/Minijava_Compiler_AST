@@ -13,23 +13,22 @@ import java.util.List;
 public class Compiler {
 
     // Commented out until we have our AST nodes defined...
-    private SymbolTable symbols = new SymbolTable();
+    private SymbolTable symbols = new SymbolTable(SymbolTable.Level.Class);
     private PrintWriter out;
-    private final Block block;
+    private final ClassNode classNode;
     private final String className;
 
-    public Compiler(Block block, String className) {
-        this.block = block;
+    public Compiler(ClassNode classNode, String className) {
+        this.classNode = classNode;
         this.className = className;
-        symbols.allocateLocalVariable(1);
     }
 
     public void compile(Path outputDir) throws IOException, SyntaxException {
         Path asmFilePath = outputDir.resolve(className + ".j");
         try (var out = new PrintWriter(Files.newBufferedWriter(asmFilePath))) {
             this.out = out;
-            resolveSymbols(block);
-            this.block.typecheck(symbols);
+            resolveSymbols(classNode);
+            this.classNode.typecheck(symbols);
 
             out.printf(".class public %s\n", className);
             out.printf(".super java/lang/Object\n");
@@ -54,7 +53,7 @@ public class Compiler {
             out.printf(".limit locals %d\n", symbols.getVariableCount()); // + 1 because of args
             out.println();
 
-            block.generateCode(out, symbols);
+            classNode.generateCode(out, symbols);
 
             // Generate code for program here 🙂
             // Generate code for each statement of the program
@@ -71,8 +70,8 @@ public class Compiler {
     // Make sure that all symbols (in this case, names of variables) make sense,
     // i.e. we should not be using the value of a variable before we have assigned
     // to it (Eval does not have declarations).
-    private void resolveSymbols(Block block) throws SyntaxException {
-        AST.postOrder(block, node -> {
+    private void resolveSymbols(ClassNode classNode) throws SyntaxException {
+        AST.postOrder(classNode, node -> {
             switch (node) {
                 case VarDeclaration(ParserRuleContext ctx, String name) -> {
                     if (symbols.findVariable(name).isPresent())

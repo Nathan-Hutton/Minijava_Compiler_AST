@@ -20,11 +20,11 @@ public class Main {
         var lexer = new MiniJavaLexer(CharStreams.fromFileName(TEST_FILE));
         var parser = new MiniJavaParser(new CommonTokenStream(lexer));
 
-        var methodBody = parser.methodBody().n;
-        AST.print(methodBody);
+        var goal = parser.goal().n;
+        AST.print(goal);
 
         try {
-            var compiler = new Compiler(methodBody, CLASS_NAME);
+            var compiler = new Compiler(goal, CLASS_NAME);
             compiler.compile(Path.of("test_output"));
             jasmin.Main.main(new String[] {
                     "-d", "out/test_compiled",

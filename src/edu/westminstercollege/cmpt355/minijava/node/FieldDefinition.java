@@ -5,20 +5,21 @@ import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
-public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldDefinition> fieldDefinitions, List<MethodDefinition> methods) implements Node {
-    @Override
-    public String getNodeDescription() {
-        return Node.super.getNodeDescription();
-    }
+import java.util.Optional;
+
+public record FieldDefinition(ParserRuleContext ctx, TypeNode type, String name, Optional<Expression> expr) implements Statement {
 
     @Override
     public List<? extends Node> children() {
-        List<Node> list = new ArrayList<>(imports);
-        list.addAll(fieldDefinitions);
-        list.addAll(methods);
-        return list;
+        if (expr.isPresent())
+            return List.of(type, expr.orElseThrow());
+        return List.of(type);
+    }
+
+    @Override
+    public String getNodeDescription() {
+        return name;
     }
 
     @Override

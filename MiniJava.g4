@@ -3,10 +3,32 @@ grammar MiniJava;
 @parser::header {
 import edu.westminstercollege.cmpt355.minijava.node.*;
 import edu.westminstercollege.cmpt355.minijava.Type;
+import java.util.Optional;
 }
 
 goal
-    : block EOF
+returns [ClassNode n]
+    : classNode EOF {
+        $n = $classNode.n;
+    }
+    ;
+
+classNode
+returns [ClassNode n]
+    : (importz+=imports)* (fields+=fieldDefinition)* (methods+=method)* EOF {
+        var importStmts = new ArrayList<Import>();
+        var fieldDefs = new ArrayList<FieldDefinition>();
+        var methodDefs = new ArrayList<MethodDefinition>();
+
+        for (var imp : $importz)
+            importStmts.add(imp.n);
+        for (var field : $fields)
+            fieldDefs.add(field.n);
+        for (var method : $methods)
+            methodDefs.add(method.n);
+
+        $n = new ClassNode($ctx, importStmts, fieldDefs, methodDefs);
+    }
     ;
 
 block
@@ -17,16 +39,6 @@ returns [Block n]
             statements.add(stmt.n);
 
         $n = new Block($ctx, statements);
-    }
-    ;
-
-classNode
-returns [ClassNode n]
-    : (methods+=method)* EOF {
-        var methos = new ArrayList<MethodBody>();
-        for (var method : $methods)
-            methos.add(method.n);
-        $n = new ClassNode($ctx, methos);
     }
     ;
 
@@ -65,15 +77,38 @@ returns [Statement n]
     | expression ';' {
         $n = new ExpressionStatement($ctx, $expression.n);
     }
-    | 'import' STRING ';' {
-        $n = new Import($ctx, $STRING.text);
-    }
     ;
 
 imports
 returns [Import n]
-    : ('import' | 'package') NAME {
-        $n = new Import($ctx, $NAME.text);
+    : 'import' names+=NAME ('.' names+=NAME)* '.' '*' ';' {
+        StringBuilder nameString = new StringBuilder();
+        nameString.append($names.get(0));
+        $names.remove(0);
+
+        for (var name : $names) {
+            nameString.append(name.getText());
+        }
+
+        $n = new PackageImport($ctx, nameString.toString());
+    }
+    | 'import' names+=NAME ('.' names+=NAME)* ';' {
+        StringBuilder nameString = new StringBuilder();
+        nameString.append($names.get(0));
+        $names.remove(0);
+
+        for (var name : $names) {
+            nameString.append(name.getText());
+        }
+
+        $n = new ClassImport($ctx, nameString.toString());
+    }
+;
+
+fieldDefinition
+returns [FieldDefinition n]
+    : type NAME ('=' expr=expression)? ';' {
+        $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.of($expr.n));
     }
     ;
 
