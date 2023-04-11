@@ -6,10 +6,10 @@ import edu.westminstercollege.cmpt355.minijava.Type;
 }
 
 goal
-    : methodBody EOF
+    : block EOF
     ;
 
-methodBody
+block
 returns [Block n]
     : (stmts+=statement*) {
         var statements = new ArrayList<Statement>();
@@ -17,6 +17,27 @@ returns [Block n]
             statements.add(stmt.n);
 
         $n = new Block($ctx, statements);
+    }
+    ;
+
+classNode
+returns [ClassNode n]
+    : (methods+=method)* EOF {
+        var methos = new ArrayList<MethodBody>();
+        for (var method : $methods)
+            methos.add(method.n);
+        $n = new ClassNode($ctx, methos);
+    }
+    ;
+
+method
+returns [MethodDefinition n]
+    : type NAME '(' (params+=parameter (',' param+=parameter)*)? ')' block {
+        var arguments = new ArrayList<Parameter>();
+        for (var p : $params)
+            arguments.add(p.n);
+
+        $n = new MethodDefinition($ctx, $type.n, $NAME.text, arguments, $block.n);
     }
     ;
 
@@ -35,8 +56,24 @@ returns [Statement n]
     | variableDeclaration {
         $n = $variableDeclaration.n;
     }
+    | 'return' ';' {
+        $n = new Return($ctx, Optional.empty());
+    }
+    | 'return' e=expression ';' {
+        $n = new Return($ctx, Optional.of($e.n));
+    }
     | expression ';' {
         $n = new ExpressionStatement($ctx, $expression.n);
+    }
+    | 'import' STRING ';' {
+        $n = new Import($ctx, $STRING.text);
+    }
+    ;
+
+imports
+returns [Import n]
+    : ('import' | 'package') NAME {
+        $n = new Import($ctx, $NAME.text);
     }
     ;
 
@@ -59,6 +96,13 @@ returns [DeclarationItem n]
     }
     | NAME '=' expression {
         $n = new VarDeclarationInit($ctx, $NAME.text, $expression.n);
+    }
+    ;
+
+parameter
+returns [Parameter n]
+    : type NAME {
+        $n = new Parameter($ctx, $type.n, $NAME.text);
     }
     ;
 
@@ -85,6 +129,9 @@ returns [Expression n]
     }
     | NAME {
         $n = new VariableAccess($ctx, $NAME.text);
+    }
+    | 'this' {
+        $n = new This($ctx);
     }
     | '(' expression ')' {
         $n = $expression.n;

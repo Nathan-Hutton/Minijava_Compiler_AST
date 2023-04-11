@@ -4,9 +4,21 @@ import java.util.*;
 
 public class SymbolTable {
 
+    enum Level {
+        Class, Method, Block
+    }
+
+    private Level level;
+    private SymbolTable parent;
     private Map<String, Variable> variables = new HashMap<>();
     private int variableIndex = 0;
 
+    public SymbolTable(Level level) {
+        this.level = level;
+    }
+    public void setParent(SymbolTable parent) {
+        this.parent = parent;
+    }
     public Variable registerVariable(String name) {
         Variable v = variables.get(name);
         if (v == null) {
@@ -18,16 +30,39 @@ public class SymbolTable {
     }
 
     public Optional<Variable> findVariable(String name) {
-        return Optional.ofNullable(variables.get(name));
+        // If we look up a variable in a symbol table and don't find it, then we go
+        // up to the parent and chack there.
+
+        var maybeVar = Optional.ofNullable(variables.get(name));
+        var ancestor = parent;
+
+        while (maybeVar.isEmpty()) {
+            if (ancestor != null) {
+                maybeVar = parent.findVariable(name);
+            }
+            else
+                break;
+        }
+
+        return maybeVar;
     }
 
     public int getVariableCount() {
         return variableIndex;
     }
     public int allocateLocalVariable(int size) {
-        int temp = variableIndex;
-        variableIndex += size;
-        return temp;
+
+        // Only a Method-level ST can allocate a variable
+        if (level == Level.Method) {
+            int temp = variableIndex;
+            variableIndex += size;
+            return temp;
+        }
+		else if (level == Level.Block)
+            // bump it up a level
+            return parent.allocateLocalVariable(size);
+        else
+            throw new RuntimeException("Internal compiler error: symbol table weirdness!");
     }
     public Optional<Class<?>> findJavaClass(String className) {
         Optional<Class<?>> first = Reflect.classForName(className);

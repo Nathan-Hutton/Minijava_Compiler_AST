@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public sealed interface Node
-    permits Statement, Expression, TypeNode, DeclarationItem {
+    permits Statement, Expression, TypeNode, DeclarationItem, MethodDefinition, MainMethod, Parameter, ClassNode {
 
     default String getNodeDescription() {
         String fullName = getClass().getSimpleName();
