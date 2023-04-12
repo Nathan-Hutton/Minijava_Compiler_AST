@@ -10,6 +10,11 @@ import java.util.List;
 
 public record MainMethod(ParserRuleContext ctx, Block block) implements Node {
     @Override
+    public String getNodeDescription() {
+        return "main";
+    }
+
+    @Override
     public List<? extends Node> children() {
         return List.of(block);
     }

@@ -15,7 +15,7 @@ returns [ClassNode n]
 
 classNode
 returns [ClassNode n]
-    : (importz+=imports)* (fields+=fieldDefinition)* (methods+=method)* EOF {
+    : (importz+=imports)* (fields+=fieldDefinition)* (methods+=methodDefinition)* EOF {
         var importStmts = new ArrayList<Import>();
         var fieldDefs = new ArrayList<FieldDefinition>();
         var methodDefs = new ArrayList<MethodDefinition>();
@@ -39,17 +39,6 @@ returns [Block n]
             statements.add(stmt.n);
 
         $n = new Block($ctx, statements);
-    }
-    ;
-
-method
-returns [MethodDefinition n]
-    : type NAME '(' (params+=parameter (',' param+=parameter)*)? ')' block {
-        var arguments = new ArrayList<Parameter>();
-        for (var p : $params)
-            arguments.add(p.n);
-
-        $n = new MethodDefinition($ctx, $type.n, $NAME.text, arguments, $block.n);
     }
     ;
 
@@ -112,6 +101,22 @@ returns [FieldDefinition n]
     : type NAME ('=' expr=expression)? ';' {
         $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.of($expr.n));
     }
+    ;
+
+methodDefinition
+returns [MethodDefinition n]
+    : type methodName=NAME '(' (params+=parameter (',' params+=parameter)*)? ')' '{' block '}' {
+        List<Parameter> paramNodes = new ArrayList<>();
+        for (var p : $params)
+            paramNodes.add(p.n);
+
+        $n = new MethodDefinition($ctx, $type.n, $methodName.text, paramNodes, $block.n);
+    }
+    ;
+
+mainMethod
+returns [MainMethod n]
+    : 'main' '(' ')' '{' block '}'
     ;
 
 // type followed by a comma-separated list of "items", each being just a name or a name = value.
@@ -225,6 +230,9 @@ returns [TypeNode n]
     }
     | 'boolean' {
         $n = new TypeNode($ctx, PrimitiveType.Boolean);
+    }
+    | 'void' {
+        $n = new TypeNode($ctx, VoidType.Instance);
     }
     | NAME {
         $n = new TypeNode($ctx, new ClassType($NAME.text));

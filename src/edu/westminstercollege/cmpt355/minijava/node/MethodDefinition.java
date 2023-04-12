@@ -12,7 +12,7 @@ import java.util.List;
 public record MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block) implements Node {
     @Override
     public String getNodeDescription() {
-        return "name";
+        return "[MethodDefinition] " + name;
     }
 
     @Override

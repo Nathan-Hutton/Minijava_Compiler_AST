@@ -11,7 +11,7 @@ import java.util.List;
 public record Parameter(ParserRuleContext ctx, TypeNode type, String name) implements Node {
     @Override
     public String getNodeDescription() {
-        return name;
+        return "[Parameter] " + name;
     }
 
     @Override

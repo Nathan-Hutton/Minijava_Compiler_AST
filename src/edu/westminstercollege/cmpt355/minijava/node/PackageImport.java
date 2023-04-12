@@ -14,6 +14,11 @@ public record PackageImport(ParserRuleContext ctx, String path) implements Impor
     }
 
     @Override
+    public String getNodeDescription() {
+        return "[PackageImport] " + path;
+    }
+
+    @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
 
     }

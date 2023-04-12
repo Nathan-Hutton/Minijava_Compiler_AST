@@ -19,7 +19,7 @@ public record FieldDefinition(ParserRuleContext ctx, TypeNode type, String name,
 
     @Override
     public String getNodeDescription() {
-        return name;
+        return "[FieldDefinition] " + name;
     }
 
     @Override
