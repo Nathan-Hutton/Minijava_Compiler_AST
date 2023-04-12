@@ -83,10 +83,11 @@ imports
 returns [Import n]
     : 'import' names+=NAME ('.' names+=NAME)* '.' '*' ';' {
         StringBuilder nameString = new StringBuilder();
-        nameString.append($names.get(0));
+        nameString.append($names.get(0).getText());
         $names.remove(0);
 
         for (var name : $names) {
+            nameString.append(".");
             nameString.append(name.getText());
         }
 
@@ -94,10 +95,11 @@ returns [Import n]
     }
     | 'import' names+=NAME ('.' names+=NAME)* ';' {
         StringBuilder nameString = new StringBuilder();
-        nameString.append($names.get(0));
+        nameString.append($names.get(0).getText());
         $names.remove(0);
 
         for (var name : $names) {
+            nameString.append(".");
             nameString.append(name.getText());
         }
 

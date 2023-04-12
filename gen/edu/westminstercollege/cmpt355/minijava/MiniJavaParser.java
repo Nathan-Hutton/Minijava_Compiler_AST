@@ -617,10 +617,11 @@ public class MiniJavaParser extends Parser {
 				match(T__3);
 
 				        StringBuilder nameString = new StringBuilder();
-				        nameString.append(((ImportsContext)_localctx).names.get(0));
+				        nameString.append(((ImportsContext)_localctx).names.get(0).getText());
 				        ((ImportsContext)_localctx).names.remove(0);
 
 				        for (var name : ((ImportsContext)_localctx).names) {
+				            nameString.append(".");
 				            nameString.append(name.getText());
 				        }
 
@@ -657,10 +658,11 @@ public class MiniJavaParser extends Parser {
 				match(T__3);
 
 				        StringBuilder nameString = new StringBuilder();
-				        nameString.append(((ImportsContext)_localctx).names.get(0));
+				        nameString.append(((ImportsContext)_localctx).names.get(0).getText());
 				        ((ImportsContext)_localctx).names.remove(0);
 
 				        for (var name : ((ImportsContext)_localctx).names) {
+				            nameString.append(".");
 				            nameString.append(name.getText());
 				        }
 

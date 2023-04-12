@@ -14,6 +14,11 @@ public record ClassImport(ParserRuleContext ctx, String path) implements Import 
     }
 
     @Override
+    public String getNodeDescription() {
+        return "[ClassImport] " + path;
+    }
+
+    @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
 
     }
