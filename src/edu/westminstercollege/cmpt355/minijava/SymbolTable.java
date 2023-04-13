@@ -93,6 +93,7 @@ public class SymbolTable {
             v = new Variable(type, name);
             variables.put(name, v);
         }
+        v.setField(false);
 
         return v;
     }

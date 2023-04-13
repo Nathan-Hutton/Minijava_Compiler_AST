@@ -25,7 +25,5 @@ public record TypeNode(ParserRuleContext ctx, Type type) implements Node {
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {
-        return;
-    }
+    public void typecheck(SymbolTable symbols) throws SyntaxException {}
 }

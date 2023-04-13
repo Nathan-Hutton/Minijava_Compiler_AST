@@ -216,6 +216,13 @@ returns [Expression n]
 
         $n = new MethodCall($ctx, $e.n, $NAME.text, expressions);
     }
+    | NAME '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
+            var expressions = new ArrayList<Expression>();
+            for (var expr : $exprs)
+                expressions.add(expr.n);
+
+            $n = new MethodCall($ctx, new This($ctx), $NAME.text, expressions);
+        }
     | 'new' NAME '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
         var expressions = new ArrayList<Expression>();
         for (var expr : $exprs)

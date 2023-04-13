@@ -29,7 +29,8 @@ public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldD
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-
+        for (var child : children())
+            child.typecheck(symbols);
     }
 
     @Override

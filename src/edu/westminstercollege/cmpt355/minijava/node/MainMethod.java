@@ -24,9 +24,9 @@ public record MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolT
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-
+        block.typecheck(symbolTable);
+        symbolTable.allocateLocalVariable(1);
     }
-
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
 

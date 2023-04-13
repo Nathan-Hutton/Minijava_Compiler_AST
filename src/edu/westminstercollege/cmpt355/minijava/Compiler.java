@@ -76,21 +76,28 @@ public class Compiler {
     private void resolveSymbols(Node node, SymbolTable symbols) throws SyntaxException{
         switch(node){
             case FieldDefinition(ParserRuleContext ctx, TypeNode type, String name, Optional<Expression> expr) -> {
+                if (symbols.findField(new ClassType(className), name).isPresent()) {
+                    System.out.println(1);
+                    throw new SyntaxException(node, String.format("%s already exists", name));
+                }
                 symbols.registerField(type.type(), name);
+
+                for (Node child : node.children())
+                    resolveSymbols(child, symbols);
             }
             case MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block, SymbolTable symbolTable) -> {
                 List<Type> paramTypes = new ArrayList<>();
                 for(Parameter p : parameters)
                     paramTypes.add(p.type().type());
 
-                symbolTable.registerMethod(name, paramTypes, returnType.type());
+                symbols.registerMethod(name, paramTypes, returnType.type());
                 symbolTable.setParent(symbols);
 
                 for (Node child : node.children())
                     resolveSymbols(child, symbolTable);
             }
             case MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolTable) -> {
-                symbolTable.registerMethod("Main", List.of(), VoidType.Instance);
+                symbols.registerMethod("Main", List.of(), VoidType.Instance);
                 symbolTable.setParent(symbols);
 
                 for (Node child : node.children())
@@ -107,16 +114,27 @@ public class Compiler {
                 for (var child : node.children())
                     resolveSymbols(child, symbolTable);
             }
+            case VarDeclarations(ParserRuleContext ctx, TypeNode type, List<DeclarationItem> declarations) -> {
+                for (var child : node.children()) {
+                    resolveSymbols(child, symbols);
+                    if (child instanceof VarDeclaration)
+                        symbols.registerVariable(type.type(), ((VarDeclaration) child).name());
+                    if (child instanceof VarDeclarationInit)
+                        symbols.registerVariable(type.type(), ((VarDeclarationInit) child).name());
+                }
+            }
             case VarDeclaration(ParserRuleContext ctx, String name) -> {
                 if (symbols.findVariable(name).isPresent())
-                    throw new SyntaxException(node, String.format("%s already exists", name));
+                    if (!(symbols.findVariable(name).orElseThrow().isField()))
+                        throw new SyntaxException(node, String.format("%s already exists", name));
 
                 for (var child : node.children())
                     resolveSymbols(child, symbols);
             }
             case VarDeclarationInit(ParserRuleContext ctx, String name, Expression expression) -> {
                 if (symbols.findVariable(name).isPresent())
-                    throw new SyntaxException(node, String.format("%s already exists", name));
+                    if (!(symbols.findVariable(name).orElseThrow().isField()))
+                        throw new SyntaxException(node, String.format("%s already exists", name));
 
                 for (var child : node.children())
                     resolveSymbols(child, symbols);
@@ -149,34 +167,4 @@ public class Compiler {
         }
 
     }
-//    private void resolveSymbols(ClassNode classNode) throws SyntaxException {
-//        AST.postOrder(classNode, node -> {
-//            switch (node) {
-//                case VarDeclaration(ParserRuleContext ctx, String name) -> {
-//                    if (symbols.findVariable(name).isPresent())
-//                        throw new SyntaxException(node, String.format("%s already exists", name));
-//                }
-//                case VarDeclarationInit(ParserRuleContext ctx, String name, Expression expression) -> {
-//                    if (symbols.findVariable(name).isPresent())
-//                        throw new SyntaxException(node, String.format("%s already exists", name));
-//                }
-//                case VariableAccess(ParserRuleContext ctx, String name) -> {
-//                    if (symbols.findVariable(name).isPresent())
-//                        return;
-//                    if (symbols.findJavaClass(name).isEmpty())
-//                        throw new SyntaxException(node, String.format("Variable used before declaration: %s", name));
-//                }
-//                case Assignment(ParserRuleContext ctx, Expression variable, Expression c)  -> {
-//                    if (!(variable instanceof VariableAccess)) {
-//                        throw new SyntaxException(node, "Left hand side of the assignment is not a variable");
-//                    }
-//                    String name = ((VariableAccess) variable).name();
-//                    if (symbols.findVariable(name).isEmpty())
-//                        // No variable found
-//                        throw new SyntaxException(node, String.format("Variable has not been declared: %s", name));
-//                }
-//                default -> {}
-//            }
-//        });
-//    }
 }

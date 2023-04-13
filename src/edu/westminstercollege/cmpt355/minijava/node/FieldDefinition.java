@@ -1,7 +1,6 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
-import edu.westminstercollege.cmpt355.minijava.SymbolTable;
-import edu.westminstercollege.cmpt355.minijava.SyntaxException;
+import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
@@ -24,7 +23,22 @@ public record FieldDefinition(ParserRuleContext ctx, TypeNode type, String name,
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
+        if (expr.isPresent())
+            expr.orElseThrow().typecheck(symbols);
 
+        Optional<Variable> field = symbols.findVariable(name);
+
+        if (field.isEmpty())
+            throw new SyntaxException(String.format("Compiler tomfoolery occurred with field: %s", name));
+
+        field.orElseThrow().setType(type.type());
+
+        if (type.type() == PrimitiveType.Double) {
+            field.orElseThrow().setIndex(2);
+            return;
+        }
+
+        field.orElseThrow().setIndex(1);
     }
 
     @Override

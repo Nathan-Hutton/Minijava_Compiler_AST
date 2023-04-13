@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 public record PackageImport(ParserRuleContext ctx, String path) implements Import {
     @Override
@@ -20,7 +21,7 @@ public record PackageImport(ParserRuleContext ctx, String path) implements Impor
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-
+        symbols.importPackage(path);
     }
 
     @Override

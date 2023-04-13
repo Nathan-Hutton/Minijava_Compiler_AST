@@ -32,8 +32,6 @@ public record VarDeclarations(ParserRuleContext ctx, TypeNode type, List<Declara
         for (DeclarationItem item : declarations) {
             item.typecheck(symbols);
 
-            symbols.registerVariable(type.type(), item.name());
-
             // Item has no assignment
             if (!(item instanceof VarDeclarationInit)) {
                 Variable v = symbols.findVariable(item.name()).orElseThrow();

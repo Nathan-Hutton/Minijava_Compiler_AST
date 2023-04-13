@@ -14,7 +14,7 @@ public record VarDeclaration(ParserRuleContext ctx, String name) implements Decl
     }
     @Override
     public String getNodeDescription() {
-        return String.format("name: %s", name);
+        return String.format("[VarDeclaration]: %s", name);
     }
 
     @Override

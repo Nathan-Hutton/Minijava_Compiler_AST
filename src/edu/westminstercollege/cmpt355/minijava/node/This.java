@@ -7,6 +7,7 @@
 
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import edu.westminstercollege.cmpt355.minijava.ClassType;
 import edu.westminstercollege.cmpt355.minijava.SymbolTable;
 import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
@@ -33,6 +34,6 @@ public record This(ParserRuleContext ctx) implements Expression {
 
     @Override
     public Type getType(SymbolTable symbols) {
-        return null;
+        return new ClassType(symbols.getCompilingClassName());
     }
 }

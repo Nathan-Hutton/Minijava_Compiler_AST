@@ -1,5 +1,6 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import edu.westminstercollege.cmpt355.minijava.PrimitiveType;
 import edu.westminstercollege.cmpt355.minijava.SymbolTable;
 import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
@@ -20,7 +21,14 @@ public record Parameter(ParserRuleContext ctx, TypeNode type, String name) imple
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {}
+    public void typecheck(SymbolTable symbols) throws SyntaxException {
+        if (type.type() == PrimitiveType.Double) {
+            symbols.allocateLocalVariable(2);
+            return;
+        }
+
+        symbols.allocateLocalVariable(1);
+    }
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {

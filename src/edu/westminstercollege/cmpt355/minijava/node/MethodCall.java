@@ -11,7 +11,7 @@ import java.util.Optional;
 public record MethodCall(ParserRuleContext ctx, Expression expr, String methodName, List<Expression> arguments) implements Expression {
     @Override
     public String getNodeDescription() {
-        return String.format("Method Call: %s", methodName);
+        return String.format("[Method Call] %s", methodName);
     }
 
     @Override

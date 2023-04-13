@@ -29,7 +29,12 @@ public record MethodDefinition(ParserRuleContext ctx, TypeNode returnType, Strin
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {}
+    public void typecheck(SymbolTable symbols) throws SyntaxException {
+        for (var child : children())
+            child.typecheck(symbolTable);
+
+        symbolTable.allocateLocalVariable(1);
+    }
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {

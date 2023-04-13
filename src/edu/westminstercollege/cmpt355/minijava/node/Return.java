@@ -30,9 +30,7 @@ public record Return(ParserRuleContext ctx, Optional<Expression> value) implemen
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {
-
-    }
+    public void typecheck(SymbolTable symbols) throws SyntaxException {}
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
