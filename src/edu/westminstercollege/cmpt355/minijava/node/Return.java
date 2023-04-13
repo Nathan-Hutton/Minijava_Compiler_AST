@@ -21,10 +21,7 @@ import java.util.Optional;
 public record Return(ParserRuleContext ctx, Optional<Expression> value) implements Statement {
     @Override
     public String getNodeDescription() {
-        if (value.isPresent())
-            return value.orElseThrow().toString();
-        else
-            return Statement.super.getNodeDescription();
+        return "[return]";
     }
 
     @Override

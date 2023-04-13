@@ -1,1 +1,6 @@
-void j() {}
+main()
+{
+    // Use of a variable to initialize itself
+    // To catch this, you might need to change what order the AST nodes are iterated over...
+    int rutabaga = rutabaga;
+}

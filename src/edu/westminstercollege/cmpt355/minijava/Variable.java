@@ -3,10 +3,12 @@ package edu.westminstercollege.cmpt355.minijava;
 public class Variable {
 
     private String name;
-    private int index;
+    private int index = -99;
     private Type type;
+    private Boolean isField;
 
-    public Variable(String name) {
+    public Variable(Type type, String name) {
+        this.type = type;
         this.name = name;
     }
     public Type getType() {
@@ -26,5 +28,11 @@ public class Variable {
     }
     public void setIndex(int index) {
         this.index = index;
+    }
+    public void setField(boolean isField) {
+        this.isField = isField;
+    }
+    public boolean isField() {
+        return isField;
     }
 }

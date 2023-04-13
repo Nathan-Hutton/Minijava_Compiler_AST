@@ -3,13 +3,10 @@ package edu.westminstercollege.cmpt355.minijava;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Scanner;
 
 public class Main {
 
@@ -24,6 +21,8 @@ public class Main {
         AST.print(goal);
 
         try {
+            var compiledClassPath = Path.of(String.format("out/test_compiled/%s.class", CLASS_NAME));
+            Files.deleteIfExists(compiledClassPath);
             var compiler = new Compiler(goal, CLASS_NAME);
             compiler.compile(Path.of("test_output"));
             jasmin.Main.main(new String[] {

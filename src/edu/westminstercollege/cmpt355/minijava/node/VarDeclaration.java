@@ -23,7 +23,5 @@ public record VarDeclaration(ParserRuleContext ctx, String name) implements Decl
     }
 
     @Override
-    public void typecheck(SymbolTable symbols) throws SyntaxException {
-        symbols.registerVariable(name);
-    }
+    public void typecheck(SymbolTable symbols) throws SyntaxException {}
 }

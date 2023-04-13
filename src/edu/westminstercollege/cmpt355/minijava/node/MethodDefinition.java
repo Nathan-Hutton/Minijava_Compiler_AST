@@ -1,5 +1,6 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
+import edu.westminstercollege.cmpt355.minijava.Method;
 import edu.westminstercollege.cmpt355.minijava.SymbolTable;
 import edu.westminstercollege.cmpt355.minijava.SyntaxException;
 import edu.westminstercollege.cmpt355.minijava.Type;
@@ -9,7 +10,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public record MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block) implements Node {
+public record MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block, SymbolTable symbolTable) implements Node {
+    public MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block) {
+        this(ctx, returnType, name, parameters, block, new SymbolTable(SymbolTable.Level.Method));
+    }
     @Override
     public String getNodeDescription() {
         return "[MethodDefinition] " + name;

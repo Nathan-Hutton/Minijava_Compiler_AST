@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Compiler {
 
@@ -21,13 +23,14 @@ public class Compiler {
     public Compiler(ClassNode classNode, String className) {
         this.classNode = classNode;
         this.className = className;
+        symbols.setCompilingClassName(className);
     }
 
     public void compile(Path outputDir) throws IOException, SyntaxException {
         Path asmFilePath = outputDir.resolve(className + ".j");
         try (var out = new PrintWriter(Files.newBufferedWriter(asmFilePath))) {
             this.out = out;
-            resolveSymbols(classNode);
+            resolveSymbols(this.classNode, symbols);
             this.classNode.typecheck(symbols);
 
             out.printf(".class public %s\n", className);
@@ -70,135 +73,110 @@ public class Compiler {
     // Make sure that all symbols (in this case, names of variables) make sense,
     // i.e. we should not be using the value of a variable before we have assigned
     // to it (Eval does not have declarations).
-    private void resolveSymbols(ClassNode classNode) throws SyntaxException {
-        AST.postOrder(classNode, node -> {
-            switch (node) {
-                case VarDeclaration(ParserRuleContext ctx, String name) -> {
-                    if (symbols.findVariable(name).isPresent())
-                        throw new SyntaxException(node, String.format("%s already exists", name));
-                    else
-                        symbols.registerVariable(name);
-                }
-                case VarDeclarationInit(ParserRuleContext ctx, String name, Expression expression) -> {
-                    if (symbols.findVariable(name).isPresent())
-                        throw new SyntaxException(node, String.format("%s already exists", name));
-                    else
-                        symbols.registerVariable(name);
-                }
-                case VariableAccess(ParserRuleContext ctx, String name) -> {
-                    if (symbols.findVariable(name).isPresent())
-                        return;
-                    if (symbols.findJavaClass(name).isEmpty())
-                        throw new SyntaxException(node, String.format("Variable used before declaration: %s", name));
-                }
-                case Assignment(ParserRuleContext ctx, Expression variable, Expression c)  -> {
-                    if (!(variable instanceof VariableAccess)) {
-                        throw new SyntaxException(node, "Left hand side of the assignment is not a variable");
-                    }
-                    String name = ((VariableAccess) variable).name();
-                    if (symbols.findVariable(name).isEmpty())
-                        // No variable found
-                        throw new SyntaxException(node, String.format("Variable has not been declared: %s", name));
-                }
-                default -> {}
+    private void resolveSymbols(Node node, SymbolTable symbols) throws SyntaxException{
+        switch(node){
+            case FieldDefinition(ParserRuleContext ctx, TypeNode type, String name, Optional<Expression> expr) -> {
+                symbols.registerField(type.type(), name);
             }
-        });
+            case MethodDefinition(ParserRuleContext ctx, TypeNode returnType, String name, List<Parameter> parameters, Block block, SymbolTable symbolTable) -> {
+                List<Type> paramTypes = new ArrayList<>();
+                for(Parameter p : parameters)
+                    paramTypes.add(p.type().type());
+
+                symbolTable.registerMethod(name, paramTypes, returnType.type());
+                symbolTable.setParent(symbols);
+
+                for (Node child : node.children())
+                    resolveSymbols(child, symbolTable);
+            }
+            case MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolTable) -> {
+                symbolTable.registerMethod("Main", List.of(), VoidType.Instance);
+                symbolTable.setParent(symbols);
+
+                for (Node child : node.children())
+                    resolveSymbols(child, symbolTable);
+            }
+            case Parameter(ParserRuleContext ctx, TypeNode type, String name) -> {
+                symbols.registerVariable(type.type(), name);
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+            case Block(ParserRuleContext ctx, List<Statement> statements, SymbolTable symbolTable) -> {
+                symbolTable.setParent(symbols);
+
+                for (var child : node.children())
+                    resolveSymbols(child, symbolTable);
+            }
+            case VarDeclaration(ParserRuleContext ctx, String name) -> {
+                if (symbols.findVariable(name).isPresent())
+                    throw new SyntaxException(node, String.format("%s already exists", name));
+
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+            case VarDeclarationInit(ParserRuleContext ctx, String name, Expression expression) -> {
+                if (symbols.findVariable(name).isPresent())
+                    throw new SyntaxException(node, String.format("%s already exists", name));
+
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+            case VariableAccess(ParserRuleContext ctx, String name) -> {
+                if (symbols.findVariable(name).isPresent())
+                    return;
+                if (symbols.findJavaClass(name).isEmpty())
+                    throw new SyntaxException(node, String.format("Variable used before declaration: %s", name));
+
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+            case Assignment(ParserRuleContext ctx, Expression variable, Expression c)  -> {
+                if (!(variable instanceof VariableAccess))
+                    throw new SyntaxException(node, "Left hand side of the assignment is not a variable");
+
+                String name = ((VariableAccess) variable).name();
+                if (symbols.findVariable(name).isEmpty())
+                    // No variable found
+                    throw new SyntaxException(node, String.format("Variable has not been declared: %s", name));
+
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+            default -> {
+                for (var child : node.children())
+                    resolveSymbols(child, symbols);
+            }
+        }
+
     }
-
-//    private void generateCode(Statement statement) {
-//        switch (statement) {
-//            case Print(List<PrintArgument> args) -> {
-//                // Print each argument individually (using generateCode(PrintArgument))
-//                // then do a println
-//                for (var arg : args)
-//                    generateCode(arg);
-//                //aggs.forEach(this::generateCode);
-//                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
-//                out.println("invokevirtual java/io/PrintStream/println()V");
+//    private void resolveSymbols(ClassNode classNode) throws SyntaxException {
+//        AST.postOrder(classNode, node -> {
+//            switch (node) {
+//                case VarDeclaration(ParserRuleContext ctx, String name) -> {
+//                    if (symbols.findVariable(name).isPresent())
+//                        throw new SyntaxException(node, String.format("%s already exists", name));
+//                }
+//                case VarDeclarationInit(ParserRuleContext ctx, String name, Expression expression) -> {
+//                    if (symbols.findVariable(name).isPresent())
+//                        throw new SyntaxException(node, String.format("%s already exists", name));
+//                }
+//                case VariableAccess(ParserRuleContext ctx, String name) -> {
+//                    if (symbols.findVariable(name).isPresent())
+//                        return;
+//                    if (symbols.findJavaClass(name).isEmpty())
+//                        throw new SyntaxException(node, String.format("Variable used before declaration: %s", name));
+//                }
+//                case Assignment(ParserRuleContext ctx, Expression variable, Expression c)  -> {
+//                    if (!(variable instanceof VariableAccess)) {
+//                        throw new SyntaxException(node, "Left hand side of the assignment is not a variable");
+//                    }
+//                    String name = ((VariableAccess) variable).name();
+//                    if (symbols.findVariable(name).isEmpty())
+//                        // No variable found
+//                        throw new SyntaxException(node, String.format("Variable has not been declared: %s", name));
+//                }
+//                default -> {}
 //            }
-//            case Assignment(String varName, Expression value) -> {
-//                Variable var = symbols.findVariable(varName).get();
-//                generateCode(value); // get the value to be assigned on top of the stack
-//                out.printf("dstore %d\n", var.getIndex());
-//            }
-//            // Don't need default since we've handled all the cases in the sealed interface
-//        }
+//        });
 //    }
-//
-//    private void generateCode(PrintArgument argument) {
-//        switch (argument) {
-//            case Expression e ->  {
-//                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
-//                generateCode(e);
-//                out.println("invokevirtual java/io/PrintStream/println(D)V");
-//            }
-//            case StringArgument(String text) -> {
-//                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
-//                out.printf("ldc %s\n", text);
-//                out.println("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
-//            }
-//            default ->
-//                    throw new RuntimeException(String.format("Unimplemented: %s", argument.getNodeDescription()));
-//        }
-//    }
-//
-//    private void generateCode(Expression expr) {
-//        switch (expr) {
-//            case Literal(String text) -> {
-//                out.printf("ldc2_w %f\n", Double.parseDouble(text));
-//            }
-//            case Add(Expression left, Expression right) -> {
-//                generateCode(left);
-//                generateCode(right);
-//                out.println("dadd");
-//            }
-//            case Subtract(Expression left, Expression right) -> {
-//                generateCode(left);
-//                generateCode(right);
-//                out.println("dsub");
-//            }
-//            case Multiply(Expression left, Expression right) -> {
-//                generateCode(left);
-//                generateCode(right);
-//                out.println("dmul");
-//            }
-//            case Divide(Expression left, Expression right) -> {
-//                generateCode(left);
-//                generateCode(right);
-//                out.println("ddiv");
-//            }
-//            case Power(Expression left, Expression right) -> {
-//                generateCode(left);
-//                generateCode(right);
-//                out.println("invokestatic java/lang/Math/pow(DD)D");
-//            }
-//            case SquareRoot(Expression child) -> {
-//                generateCode(child);
-//                out.println("invokestatic java/lang/Math/sqrt(D)D");
-//            }
-//            case Negate(Expression child) -> {
-//                generateCode(child);
-//                out.println("dneg");
-//            }
-//            case VariableAccess(String variableName) -> {
-//                Variable v = symbols.findVariable(variableName).get();
-//                out.printf("dload %d\n", v.getIndex());
-//            }
-//            case Input(List<PrintArgument> args) -> {
-//                // Print out the arguments
-//                for (var arg : args)
-//                    generateCode(arg);
-//
-//                // Read a double value from the user
-//                // Load the value of "in" (the static Scanner variable)
-//                out.printf("getstatic %s/in Ljava/util/Scanner;\n", className);
-//                // Call the nextDouble() method
-//                out.println("invokevirtual java/util/Scanner/nextDouble()D");
-//            }
-//            default ->
-//                    throw new RuntimeException(String.format("Unimplemented: %s", expr.getNodeDescription()));
-//        }
-//    }
-
-    //
 }

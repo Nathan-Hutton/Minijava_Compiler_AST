@@ -7,7 +7,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldDefinition> fieldDefinitions, List<MethodDefinition> methods) implements Node {
+import java.util.Optional;
+
+public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldDefinition> fieldDefinitions, List<MethodDefinition> methods, Optional<MainMethod> main) implements Node {
     @Override
     public String getNodeDescription() {
         return Node.super.getNodeDescription();
@@ -18,6 +20,10 @@ public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldD
         List<Node> list = new ArrayList<>(imports);
         list.addAll(fieldDefinitions);
         list.addAll(methods);
+
+        if (main.isPresent())
+            list.add(main.orElseThrow());
+
         return list;
     }
 

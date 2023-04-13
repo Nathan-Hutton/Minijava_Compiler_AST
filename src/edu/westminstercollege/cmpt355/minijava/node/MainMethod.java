@@ -8,7 +8,10 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import java.io.PrintWriter;
 import java.util.List;
 
-public record MainMethod(ParserRuleContext ctx, Block block) implements Node {
+public record MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolTable) implements Node {
+    public MainMethod(ParserRuleContext ctx, Block block) {
+        this(ctx, block, new SymbolTable(SymbolTable.Level.Method));
+    }
     @Override
     public String getNodeDescription() {
         return "main";

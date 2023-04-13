@@ -15,7 +15,7 @@ returns [ClassNode n]
 
 classNode
 returns [ClassNode n]
-    : (importz+=imports)* (fields+=fieldDefinition)* (methods+=methodDefinition)* EOF {
+    : (importz+=imports)* (fields+=fieldDefinition)* (methods+=methodDefinition)* mainMethod? EOF {
         var importStmts = new ArrayList<Import>();
         var fieldDefs = new ArrayList<FieldDefinition>();
         var methodDefs = new ArrayList<MethodDefinition>();
@@ -27,7 +27,10 @@ returns [ClassNode n]
         for (var method : $methods)
             methodDefs.add(method.n);
 
-        $n = new ClassNode($ctx, importStmts, fieldDefs, methodDefs);
+        if ($mainMethod.ctx != null)
+            $n = new ClassNode($ctx, importStmts, fieldDefs, methodDefs, Optional.of($mainMethod.n));
+        else
+            $n = new ClassNode($ctx, importStmts, fieldDefs, methodDefs, Optional.empty());
     }
     ;
 
@@ -66,6 +69,12 @@ returns [Statement n]
     | expression ';' {
         $n = new ExpressionStatement($ctx, $expression.n);
     }
+    | 'return' ';' {
+        $n = new Return($ctx, Optional.empty());
+    }
+    | 'return' e=expression ';' {
+        $n = new Return($ctx, Optional.of($e.n));
+    }
     ;
 
 imports
@@ -99,7 +108,10 @@ returns [Import n]
 fieldDefinition
 returns [FieldDefinition n]
     : type NAME ('=' expr=expression)? ';' {
-        $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.of($expr.n));
+        if ($expr.ctx != null)
+            $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.of($expr.n));
+        else
+            $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.empty());
     }
     ;
 
@@ -116,7 +128,9 @@ returns [MethodDefinition n]
 
 mainMethod
 returns [MainMethod n]
-    : 'main' '(' ')' '{' block '}'
+    : 'main' '(' ')' '{' block '}' {
+        $n = new MainMethod($ctx, $block.n);
+    }
     ;
 
 // type followed by a comma-separated list of "items", each being just a name or a name = value.
@@ -165,6 +179,9 @@ returns [Expression n]
     }
     | BOOLEAN {
         $n = new BooleanLiteral($ctx, Boolean.parseBoolean($BOOLEAN.text));
+    }
+    | 'this' {
+        $n = new This($ctx);
     }
     | STRING {
         $n = new StringLiteral($ctx, $STRING.text);
