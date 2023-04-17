@@ -1,13 +1,12 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
-import edu.westminstercollege.cmpt355.minijava.PrimitiveType;
-import edu.westminstercollege.cmpt355.minijava.SymbolTable;
-import edu.westminstercollege.cmpt355.minijava.SyntaxException;
-import edu.westminstercollege.cmpt355.minijava.Type;
+import edu.westminstercollege.cmpt355.minijava.*;
+import jas.Var;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 public record Parameter(ParserRuleContext ctx, TypeNode type, String name) implements Node {
     @Override
@@ -22,12 +21,15 @@ public record Parameter(ParserRuleContext ctx, TypeNode type, String name) imple
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-        if (type.type() == PrimitiveType.Double) {
-            symbols.allocateLocalVariable(2);
-            return;
-        }
+        Optional<Variable> param = symbols.findVariable(name);
 
-        symbols.allocateLocalVariable(1);
+        if (param.isEmpty())
+            throw new SyntaxException(String.format("%s in unintialized", name));
+
+        if (type.type() == PrimitiveType.Double)
+            param.orElseThrow().setIndex(symbols.allocateLocalVariable(2));
+        else
+            param.orElseThrow().setIndex(symbols.allocateLocalVariable(1));
     }
 
     @Override

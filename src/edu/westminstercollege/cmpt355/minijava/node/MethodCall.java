@@ -26,23 +26,27 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
     public void generateCode(PrintWriter out, SymbolTable symbols) {
         expr.generateCode(out, symbols);
 
+
         List<Type> mini_param_types = new ArrayList<>();
         for (Expression arg : arguments) {
             arg.generateCode(out, symbols);
             mini_param_types.add(arg.getType(symbols));
         }
 
-        Type expr_type = expr.getType(symbols);
-        String source_class_name = symbols.findJavaClass(expr.getType(symbols).toString()).orElseThrow().getName();
+        String class_name;
+        if (expr.getType(symbols).equals(new ClassType(symbols.getCompilingClassName())))
+            class_name = expr.getType(symbols).toString();
+        else
+            class_name = symbols.findJavaClass(expr.getType(symbols).toString()).orElseThrow().getName();
 
         Optional<Method> method = symbols.findMethod(((ClassType) expr.getType(symbols)) , methodName, mini_param_types);
-        if (method.orElseThrow().containingType() instanceof StaticType) {
-            generateCodeStatic(out, symbols, source_class_name, method.orElseThrow().returnType(), mini_param_types);
+        if (method.orElseThrow().containingType() instanceof StaticType || expr instanceof This) {
+            generateCodeStatic(out, symbols, class_name, method.orElseThrow().returnType(), mini_param_types);
             return;
         }
 
 
-        generateCodeNonstatic(out, symbols, source_class_name, method.orElseThrow().returnType(), mini_param_types);
+        generateCodeNonstatic(out, symbols, class_name, method.orElseThrow().returnType(), mini_param_types);
     }
     public void generateCodeStatic(PrintWriter out, SymbolTable symbols, String source_class_name, Type returnType, List<Type> mini_param_types)
     {
@@ -59,15 +63,16 @@ public record MethodCall(ParserRuleContext ctx, Expression expr, String methodNa
         }
 
         if (returnType instanceof VoidType)
-            out.printf("invokestatic %s/%s(%s)V\n", source_class_name, methodName, type_string);
+            out.printf("invokevirtual %s/%s(%s)V\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Int)
-            out.printf("invokestatic %s/%s(%s)I\n", source_class_name, methodName, type_string);
+            out.printf("invokevirtual %s/%s(%s)I\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Double)
-            out.printf("invokestatic %s/%s(%s)D\n", source_class_name, methodName, type_string);
+            out.printf("invokevirtual %s/%s(%s)D\n", source_class_name, methodName, type_string);
         else if (returnType == PrimitiveType.Boolean)
-            out.printf("invokestatic %s/%s(%s)Z\n", source_class_name, methodName, type_string);
+            out.printf("invokevirtual %s/%s(%s)Z\n", source_class_name, methodName, type_string);
         else if (returnType instanceof ClassType) {
-            out.printf("invokestatic %s/%s(%s)L%s;\n", source_class_name, methodName, type_string, returnType.toString().replace('.', '/'));
+            String class_name = symbols.classFromType(new ClassType(returnType.toString())).orElseThrow().getName().replace('.', '/');
+            out.printf("invokevirtual %s/%s(%s)L%s;\n", source_class_name, methodName, type_string, class_name);
         }
     }
     public void generateCodeNonstatic(PrintWriter out, SymbolTable symbols, String source_class_name, Type returnType, List<Type> mini_param_types)

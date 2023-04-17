@@ -1,32 +1,43 @@
+// test.minijava
+
+/*
+ * (Note: a line in main() refers to this class, "test":
+ *     test temp = this;
+ * If you save this program as something other than
+ * test.minijava, you will need to update that line
+ * in order for this to compile.
+ */
+
+/*
+ * Input: 212
+ * Output: 212.0°F is 100.0°C
+ *
+ * Input: -40
+ * Output: -40.0°F is -40.0°C
+ */
+
 import java.util.Scanner;
+import java.lang.reflect.*;
 
-Scanner in = new Scanner(System.in);
+double FACTOR = 5.0 / 9;
+double OFFSET = 32;
 
-double discriminant(double a, double b, double c) {
-    return Math.pow(b, 2.0) - 4 * a * c;
+double FtoC(double F) {
+    double C = this.FACTOR * (F - OFFSET);
+    return C;
 }
 
-double firstRoot(double a, double b, double c, double D) {
-    return (-b - Math.sqrt(D)) / (2 * a);
-}
-
-double secondRoot(double a, double b, double c, double D) {
-    return (-b + Math.sqrt(D)) / (2 * a);
-}
-
-double input(String text) {
-    System.out.print(text);
-    return in.nextDouble();
+String toString() {
+    return "This is a Temp object!";
 }
 
 main() {
-    double a = input("Enter a: ");
-    double b = input("Enter b: ");
-    double c = input("Enter c: ");
+    Scanner in = new Scanner(System.in);
+    System.out.print("Enter a temperature in Fahrenheit (°F): ");
+    double fahr = in.nextDouble();
 
-    double D = discriminant(a, b, c);
-    double x1 = firstRoot(a, b, c, D);
-    double x2 = secondRoot(a, b, c, D);
+    test1 temp = this;
+    double cels = temp.FtoC(fahr);
 
-    System.out.println("The real roots are " + x1 + " and " + x2 + ".");
+    System.out.println(fahr + "°F is " + cels + "°C");
 }

@@ -47,14 +47,18 @@ public record FieldAccess(ParserRuleContext ctx, Expression expr, String fieldNa
         Type field_type = getType(symbols);
         Type expr_type = expr.getType(symbols);
 
-        String source_class_name = symbols.findJavaClass(expr.getType(symbols).toString()).orElseThrow().getName();
+        String class_name;
+        if (expr_type.equals(new ClassType(symbols.getCompilingClassName())))
+            class_name = symbols.getCompilingClassName();
+        else
+            class_name = symbols.findJavaClass(expr_type.toString()).orElseThrow().getName();
 
         if (expr_type instanceof StaticType) {
-            generateCodeStatic(out, symbols, field_type, source_class_name);
+            generateCodeStatic(out, symbols, field_type, class_name);
             return;
         }
 
-        generateCodeNonstatic(out, symbols, field_type, source_class_name);
+        generateCodeNonstatic(out, symbols, field_type, class_name);
     }
     public void generateCodeStatic(PrintWriter out, SymbolTable symbols, Type field_type, String source_class_name)
     {

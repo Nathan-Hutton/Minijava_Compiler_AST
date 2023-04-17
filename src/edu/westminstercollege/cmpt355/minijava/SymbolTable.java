@@ -123,8 +123,9 @@ public class SymbolTable {
             int index = variableIndex;
             variableIndex += size;
             return index;
-        } else if (parent != null)
+        } else if (parent != null) {
             return parent.allocateLocalVariable(size);
+        }
         else
             throw new RuntimeException("Internal compiler error: cannot allocate local variable at level " + level);
     }

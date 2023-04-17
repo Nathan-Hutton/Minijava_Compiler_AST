@@ -10,8 +10,7 @@
 
 package edu.westminstercollege.cmpt355.minijava.node;
 
-import edu.westminstercollege.cmpt355.minijava.SymbolTable;
-import edu.westminstercollege.cmpt355.minijava.SyntaxException;
+import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
@@ -34,6 +33,22 @@ public record Return(ParserRuleContext ctx, Optional<Expression> value) implemen
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
+        if (value.isPresent())
+            value.orElseThrow().generateCode(out, symbols);
+
+        if (value.isEmpty()) {
+            out.println("return");
+            return;
+        }
+
+        Type value_type = value.orElseThrow().getType(symbols);
+
+        if (value_type == PrimitiveType.Int ||value_type == PrimitiveType.Boolean)
+            out.println("ireturn");
+        else if (value_type == PrimitiveType.Double)
+            out.println("dreturn");
+        else if (value_type instanceof ClassType)
+            out.println("areturn");
 
     }
 }

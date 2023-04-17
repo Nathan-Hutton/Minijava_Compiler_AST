@@ -1,9 +1,6 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
-import edu.westminstercollege.cmpt355.minijava.PrimitiveType;
-import edu.westminstercollege.cmpt355.minijava.SymbolTable;
-import edu.westminstercollege.cmpt355.minijava.SyntaxException;
-import edu.westminstercollege.cmpt355.minijava.Variable;
+import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import javax.swing.plaf.nimbus.State;
@@ -29,11 +26,17 @@ public record VarDeclarations(ParserRuleContext ctx, TypeNode type, List<Declara
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
+
+        if (type.type() instanceof ClassType && !(type.type().toString().equals(symbols.getCompilingClassName()))) {
+            if (symbols.classFromType(type.type()).isEmpty())
+                throw new SyntaxException(this, String.format("There is no class of type %s", type.type()));
+        }
+
         for (DeclarationItem item : declarations) {
             item.typecheck(symbols);
 
             // Item has no assignment
-            if (!(item instanceof VarDeclarationInit)) {
+            if (item instanceof VarDeclaration) {
                 Variable v = symbols.findVariable(item.name()).orElseThrow();
                 v.setType(type.type());
 

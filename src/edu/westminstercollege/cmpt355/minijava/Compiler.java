@@ -32,31 +32,22 @@ public class Compiler {
             this.out = out;
             resolveSymbols(this.classNode, symbols);
             this.classNode.typecheck(symbols);
-
-            out.printf(".class public %s\n", className);
-            out.printf(".super java/lang/Object\n");
-            out.println();
-            out.println(".field private static in Ljava/util/Scanner;");
-            out.println();
-            out.printf("""
-                    .method static <clinit>()V
-                    .limit stack 3
-                    .limit locals 0
-                    new java/util/Scanner
-                    dup
-                    getstatic java/lang/System/in Ljava/io/InputStream;
-                    invokenonvirtual java/util/Scanner/<init>(Ljava/io/InputStream;)V
-                    putstatic %s/in Ljava/util/Scanner;
-                    return
-                    .end method
-                    
-                    """, className);
-            out.printf(".method public static main([Ljava/lang/String;)V\n");
-            out.printf(".limit stack 100\n");
-            out.printf(".limit locals %d\n", symbols.getVariableCount()); // + 1 because of args
-            out.println();
-
             classNode.generateCode(out, symbols);
+            out.println();
+//            .method static <clinit>()V    // this line was where that blank line is, but it had to go here to comment it out
+//            out.printf("""
+//
+//                    .limit stack 3
+//                    .limit locals 0
+//                    new java/util/Scanner
+//                    dup
+//                    getstatic java/lang/System/in Ljava/io/InputStream;
+//                    invokenonvirtual java/util/Scanner/<init>(Ljava/io/InputStream;)V
+//                    putstatic %s/in Ljava/util/Scanner;
+//                    return
+//                    .end method
+//
+//                    """, className);
 
             // Generate code for program here 🙂
             // Generate code for each statement of the program
@@ -65,8 +56,8 @@ public class Compiler {
 
             // program.statements().forEach(this::generateCode);
 
-            out.printf("return\n");
-            out.printf(".end method\n");
+//            out.printf("return\n");
+//            out.printf(".end method\n");
         }
     }
 
@@ -77,7 +68,6 @@ public class Compiler {
         switch(node){
             case FieldDefinition(ParserRuleContext ctx, TypeNode type, String name, Optional<Expression> expr) -> {
                 if (symbols.findField(new ClassType(className), name).isPresent()) {
-                    System.out.println(1);
                     throw new SyntaxException(node, String.format("%s already exists", name));
                 }
                 symbols.registerField(type.type(), name);
@@ -105,6 +95,7 @@ public class Compiler {
             }
             case Parameter(ParserRuleContext ctx, TypeNode type, String name) -> {
                 symbols.registerVariable(type.type(), name);
+
                 for (var child : node.children())
                     resolveSymbols(child, symbols);
             }

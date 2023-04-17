@@ -41,7 +41,6 @@ public record Cast(ParserRuleContext ctx, TypeNode type, Expression expression) 
         expression.typecheck(symbols);
         type.typecheck(symbols);
 
-        System.out.println(expression.getClass());
         Type expression_type = expression.getType(symbols);
         Type cast_type = type.type();
 

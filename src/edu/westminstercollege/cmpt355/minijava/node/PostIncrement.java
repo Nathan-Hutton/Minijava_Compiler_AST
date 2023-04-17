@@ -1,13 +1,11 @@
 package edu.westminstercollege.cmpt355.minijava.node;
 
-import edu.westminstercollege.cmpt355.minijava.PrimitiveType;
-import edu.westminstercollege.cmpt355.minijava.SymbolTable;
-import edu.westminstercollege.cmpt355.minijava.SyntaxException;
-import edu.westminstercollege.cmpt355.minijava.Type;
+import edu.westminstercollege.cmpt355.minijava.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, String op) implements Expression {
     @Override
@@ -24,17 +22,28 @@ public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, Stri
     public void generateCode(PrintWriter out, SymbolTable symbols) {
         variable.generateCode(out, symbols);
 
+        Variable v = symbols.findVariable(variable.name()).orElseThrow();
+
         if (op.equals("++")) {
             if (variable.getType(symbols) == PrimitiveType.Double) {
                 out.println("dup2");
                 out.println("dconst_1");
                 out.println("dadd");
-                out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
+                if (v.isField())
+                    out.printf("putstatic %s/%s D\n", symbols.getCompilingClassName(), variable.name());
+                else
+                    out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
             } else if (variable.getType(symbols) == PrimitiveType.Int) {
                 out.println("dup");
                 out.println("iconst_1");
                 out.println("iadd");
-                out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
+                if (v.isField())
+                    out.printf("putstatic %s/%s I\n", symbols.getCompilingClassName(), variable.name());
+                else
+                    out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
             }
         }
         else {
@@ -42,12 +51,21 @@ public record PostIncrement(ParserRuleContext ctx, VariableAccess variable, Stri
                 out.println("dup2");
                 out.println("dconst_1");
                 out.println("dsub");
-                out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
+                if (v.isField())
+                    out.printf("putstatic %s/%s D\n", symbols.getCompilingClassName(), variable.name());
+                else
+                    out.printf("dstore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
             } else if (variable.getType(symbols) == PrimitiveType.Int) {
                 out.println("dup");
                 out.println("iconst_1");
                 out.println("isub");
-                out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
+
+                if (v.isField())
+                    out.printf("putstatic %s/%s I\n", symbols.getCompilingClassName(), variable.name());
+                else
+                    out.printf("istore %d\n", symbols.findVariable(variable.name()).orElseThrow().getIndex());
             }
         }
     }

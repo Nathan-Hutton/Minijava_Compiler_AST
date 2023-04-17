@@ -18,7 +18,8 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
         expression.generateCode(out, symbols);
 
         Type type = variable.getType(symbols);
-        if (type == PrimitiveType.Double && expression instanceof IntLiteral)
+
+        if (type == PrimitiveType.Double && expression.getType(symbols) == PrimitiveType.Int)
             out.println("i2d");
 
         // This if statement is just some bullshit so I can call name() which is only accessible by VariabelAccess
@@ -31,17 +32,33 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
         if (type == PrimitiveType.Int || type == PrimitiveType.Boolean) {
             assert v != null;
             out.println("dup");
-            out.printf("istore %d\n", v.getIndex());
+
+            if (!v.isField())
+                out.printf("istore %d\n", v.getIndex());
+            else
+                out.printf("putstatic %s/%s I\n", symbols.getCompilingClassName(), v.getName());
+
         }
         else if (type == PrimitiveType.Double) {
             assert v != null;
+
             out.println("dup2");
-            out.printf("dstore %d\n", v.getIndex());
+
+            if (!v.isField())
+                out.printf("dstore %d\n", v.getIndex());
+            else
+                out.printf("putstatic %s/%s D\n", symbols.getCompilingClassName(), v.getName());
         }
         else {
             assert v != null;
             out.println("dup");
-            out.printf("astore %d\n", v.getIndex());
+
+            if (!v.isField())
+                out.printf("astore %d\n", v.getIndex());
+            else {
+                String class_name = symbols.classFromType(v.getType()).orElseThrow().getName().replace('.', '/');
+                out.printf("putstatic %s/%s L%s;\n", symbols.getCompilingClassName(), v.getName(), class_name);
+            }
         }
     }
 

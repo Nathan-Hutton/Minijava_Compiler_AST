@@ -34,6 +34,24 @@ returns [ClassNode n]
     }
     ;
 
+methodDefinition
+returns [MethodDefinition n]
+    : type methodName=NAME '(' (params+=parameter (',' params+=parameter)*)? ')' '{' block '}' {
+        List<Parameter> paramNodes = new ArrayList<>();
+        for (var p : $params)
+            paramNodes.add(p.n);
+
+        $n = new MethodDefinition($ctx, $type.n, $methodName.text, paramNodes, $block.n);
+    }
+    ;
+
+mainMethod
+returns [MainMethod n]
+    : 'main' '(' ')' '{' block '}' {
+        $n = new MainMethod($ctx, $block.n);
+    }
+    ;
+
 block
 returns [Block n]
     : (stmts+=statement*) {
@@ -112,24 +130,6 @@ returns [FieldDefinition n]
             $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.of($expr.n));
         else
             $n = new FieldDefinition($ctx, $type.n, $NAME.text, Optional.empty());
-    }
-    ;
-
-methodDefinition
-returns [MethodDefinition n]
-    : type methodName=NAME '(' (params+=parameter (',' params+=parameter)*)? ')' '{' block '}' {
-        List<Parameter> paramNodes = new ArrayList<>();
-        for (var p : $params)
-            paramNodes.add(p.n);
-
-        $n = new MethodDefinition($ctx, $type.n, $methodName.text, paramNodes, $block.n);
-    }
-    ;
-
-mainMethod
-returns [MainMethod n]
-    : 'main' '(' ')' '{' block '}' {
-        $n = new MainMethod($ctx, $block.n);
     }
     ;
 

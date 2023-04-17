@@ -19,13 +19,13 @@ public record Block(ParserRuleContext ctx, List<Statement> statements, SymbolTab
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
         for (Statement child : statements) {
-            child.generateCode(out, symbols);
+            child.generateCode(out, symbolTable);
         }
     }
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
         for (Statement stmt : statements)
-            stmt.typecheck(symbols);
+            stmt.typecheck(symbolTable);
     }
 }

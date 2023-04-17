@@ -34,8 +34,19 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
         Type type = getType(symbols);
 
         Optional<Variable> variable = symbols.findVariable(name);
+
         if (variable.isEmpty())
             return;
+
+        if (variable.orElseThrow().isField()) {
+            if (type == PrimitiveType.Int || type == PrimitiveType.Boolean)
+                out.printf("getstatic %s/%s I\n", symbols.getCompilingClassName(), name);
+            else if (type == PrimitiveType.Double)
+                out.printf("getstatic %s/%s D\n", symbols.getCompilingClassName(), name);
+            else
+                out.printf("getstatic %s/%s L%s;\n", symbols.getCompilingClassName(), name, symbols.classFromType(variable.orElseThrow().getType()).orElseThrow().getName().replace('.', '/'));
+            return;
+        }
 
         int index = variable.orElseThrow().getIndex();
 
