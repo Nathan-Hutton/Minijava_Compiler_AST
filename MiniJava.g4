@@ -78,12 +78,6 @@ returns [Statement n]
     | variableDeclaration {
         $n = $variableDeclaration.n;
     }
-    | 'return' ';' {
-        $n = new Return($ctx, Optional.empty());
-    }
-    | 'return' e=expression ';' {
-        $n = new Return($ctx, Optional.of($e.n));
-    }
     | expression ';' {
         $n = new ExpressionStatement($ctx, $expression.n);
     }
@@ -92,6 +86,9 @@ returns [Statement n]
     }
     | 'return' e=expression ';' {
         $n = new Return($ctx, Optional.of($e.n));
+    }
+    | 'while' '(' cond=expression ')' body=statement {
+        $n = new While($ctx, $cond.n, $body.n);
     }
     ;
 
