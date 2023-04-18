@@ -19,9 +19,6 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
 
         Type type = variable.getType(symbols);
 
-        if (type == PrimitiveType.Double && expression.getType(symbols) == PrimitiveType.Int)
-            out.println("i2d");
-
         // This if statement is just some bullshit so I can call name() which is only accessible by VariabelAccess
         Variable v = null;
         if (variable instanceof VariableAccess) {
@@ -35,19 +32,29 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
 
             if (!v.isField())
                 out.printf("istore %d\n", v.getIndex());
-            else
-                out.printf("putstatic %s/%s I\n", symbols.getCompilingClassName(), v.getName());
-
+            else {
+                out.println("aload_0");
+                out.println("swap");
+                out.printf("putfield %s/%s I\n", symbols.getCompilingClassName(), v.getName());
+            }
         }
         else if (type == PrimitiveType.Double) {
             assert v != null;
-
+            if (expression.getType(symbols) == PrimitiveType.Int)
+                out.println("i2d");
             out.println("dup2");
 
             if (!v.isField())
                 out.printf("dstore %d\n", v.getIndex());
-            else
-                out.printf("putstatic %s/%s D\n", symbols.getCompilingClassName(), v.getName());
+            else {
+                // Need to do goofy stuff since you can't swap a double
+                out.println("aload_0");
+                expression.generateCode(out, symbols);
+                if (expression.getType(symbols) == PrimitiveType.Int)
+                    out.println("i2d");
+                out.printf("putfield %s/%s D\n", symbols.getCompilingClassName(), v.getName());
+//                out.println("pop2");
+            }
         }
         else {
             assert v != null;
@@ -56,8 +63,10 @@ public record Assignment(ParserRuleContext ctx, Expression variable, Expression 
             if (!v.isField())
                 out.printf("astore %d\n", v.getIndex());
             else {
+                out.println("aload_0");
+                out.println("swap");
                 String class_name = symbols.classFromType(v.getType()).orElseThrow().getName().replace('.', '/');
-                out.printf("putstatic %s/%s L%s;\n", symbols.getCompilingClassName(), v.getName(), class_name);
+                out.printf("putfield %s/%s L%s;\n", symbols.getCompilingClassName(), v.getName(), class_name);
             }
         }
     }

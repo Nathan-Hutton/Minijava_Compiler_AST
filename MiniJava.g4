@@ -189,9 +189,6 @@ returns [Expression n]
     | NAME {
         $n = new VariableAccess($ctx, $NAME.text);
     }
-    | 'this' {
-        $n = new This($ctx);
-    }
     | '(' expression ')' {
         $n = $expression.n;
     }

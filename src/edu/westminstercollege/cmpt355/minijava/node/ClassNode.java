@@ -44,28 +44,22 @@ public record ClassNode(ParserRuleContext ctx, List<Import> imports, List<FieldD
             String class_name = symbols.classFromType(field.type().type()).orElseThrow().getName().replace('.', '/');
 
             if (field.type().type() == PrimitiveType.Int)
-                out.printf(".field public static %s I\n", field.name());
+                out.printf(".field public %s I\n", field.name());
             else if (field.type().type() == PrimitiveType.Double)
-                out.printf(".field public static %s D\n", field.name());
+                out.printf(".field public %s D\n", field.name());
             else if (field.type().type() == PrimitiveType.Boolean)
-                out.printf(".field public static %s Z\n", field.name());
+                out.printf(".field public %s Z\n", field.name());
             else
-                out.printf(".field public static %s L%s;\n", field.name(), class_name);
+                out.printf(".field public %s L%s;\n", field.name(), class_name);
         }
 
-        out.println("\n.method public <clinit>()V"); // Used to be static, not public
-        out.println(".limit stack 100");
-        out.println(".limit locals 1");
-        for (var field : fieldDefinitions)
-            field.generateCode(out, symbols);
-        out.println("return");
-        out.println(".end method");
-
         out.println("\n.method public <init>()V");
-        out.println(".limit stack 1");
+        out.println(".limit stack 100");
         out.println(".limit locals 1");
         out.println("aload_0");
         out.println("invokespecial java/lang/Object/<init>()V");
+        for (var field : fieldDefinitions)
+            field.generateCode(out, symbols);
         out.println("return");
         out.println(".end method");
 

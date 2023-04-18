@@ -46,19 +46,20 @@ public record FieldDefinition(ParserRuleContext ctx, TypeNode type, String name,
         if (expr.isEmpty())
             return;
 
+        out.println("aload_0");
         expr.orElseThrow().generateCode(out, symbols);
 
         if (type.type() == PrimitiveType.Int || type.type() == PrimitiveType.Boolean)
-            out.printf("putstatic %s/%s I\n", symbols.getCompilingClassName(), name);
+            out.printf("putfield %s/%s I\n", symbols.getCompilingClassName(), name);
         else if (type.type() == PrimitiveType.Double) {
             if (expr.orElseThrow().getType(symbols) == PrimitiveType.Int)
                 out.println("i2d");
 
-            out.printf("putstatic %s/%s D\n", symbols.getCompilingClassName(), name);
+            out.printf("putfield %s/%s D\n", symbols.getCompilingClassName(), name);
         }
         else {
             String class_name = symbols.classFromType(type.type()).orElseThrow().getName().replace('.', '/');
-            out.printf("putstatic %s/%s L%s;\n", symbols.getCompilingClassName(), name, class_name);
+            out.printf("putfield %s/%s L%s;\n", symbols.getCompilingClassName(), name, class_name);
         }
     }
 }

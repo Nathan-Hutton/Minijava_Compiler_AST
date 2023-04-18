@@ -24,8 +24,8 @@ public record MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolT
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-        block.typecheck(symbolTable);
         symbolTable.allocateLocalVariable(1);
+        block.typecheck(symbolTable);
     }
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
@@ -36,13 +36,5 @@ public record MainMethod(ParserRuleContext ctx, Block block, SymbolTable symbolT
         block.generateCode(out, symbolTable);
         out.println("return");
         out.println(".end method\n");
-
-//        // public static void main(String args[])
-//        out.printf(".method public static main([Ljava/lang/String;)V\n");
-//        out.printf(".limit stack 100\n");
-//        out.printf(".limit locals %d\n", symbolTable.getVariableCount() + 1); // + 1 because of args
-//        out.printf("invokestatic %s/main()V\n", symbolTable.getCompilingClassName());
-//        out.println("return");
-//        out.println(".end method");
     }
 }

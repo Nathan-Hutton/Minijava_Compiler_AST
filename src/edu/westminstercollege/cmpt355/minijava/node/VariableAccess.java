@@ -39,12 +39,13 @@ public record VariableAccess(ParserRuleContext ctx, String name) implements Expr
             return;
 
         if (variable.orElseThrow().isField()) {
+            out.println("aload_0");
             if (type == PrimitiveType.Int || type == PrimitiveType.Boolean)
-                out.printf("getstatic %s/%s I\n", symbols.getCompilingClassName(), name);
+                out.printf("getfield %s/%s I\n", symbols.getCompilingClassName(), name);
             else if (type == PrimitiveType.Double)
-                out.printf("getstatic %s/%s D\n", symbols.getCompilingClassName(), name);
+                out.printf("getfield %s/%s D\n", symbols.getCompilingClassName(), name);
             else
-                out.printf("getstatic %s/%s L%s;\n", symbols.getCompilingClassName(), name, symbols.classFromType(variable.orElseThrow().getType()).orElseThrow().getName().replace('.', '/'));
+                out.printf("getfield %s/%s L%s;\n", symbols.getCompilingClassName(), name, symbols.classFromType(variable.orElseThrow().getType()).orElseThrow().getName().replace('.', '/'));
             return;
         }
 

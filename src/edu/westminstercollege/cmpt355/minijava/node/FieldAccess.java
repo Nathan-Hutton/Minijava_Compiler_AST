@@ -74,6 +74,9 @@ public record FieldAccess(ParserRuleContext ctx, Expression expr, String fieldNa
     }
     public void generateCodeNonstatic(PrintWriter out, SymbolTable symbols, Type field_type, String source_class_name)
     {
+        out.printf("new %s\n", symbols.getCompilingClassName());
+        out.println("dup");
+        out.printf("invokespecial %s/<init>()V\n", symbols.getCompilingClassName());
         if (field_type == PrimitiveType.Int)
             out.printf("getfield %s/%s %s\n", source_class_name, fieldName, "I");
         else if (field_type == PrimitiveType.Double)

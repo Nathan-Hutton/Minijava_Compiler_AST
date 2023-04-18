@@ -27,10 +27,10 @@ public record MethodDefinition(ParserRuleContext ctx, TypeNode returnType, Strin
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
+        symbolTable.allocateLocalVariable(1);
         for (var child : children())
             child.typecheck(symbolTable);
 
-        symbolTable.allocateLocalVariable(1);
     }
 
     @Override

@@ -35,7 +35,7 @@ public record Print(ParserRuleContext ctx, List<Expression> expressions) impleme
                 out.println("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
             else if (type instanceof ClassType) {
                 out.printf("invokevirtual %s/toString()Ljava/lang/String;\n", expr.getType(symbols));
-                out.printf("invokevirtual java/io/PrintStream/print(L%s;)V\n", expr.getType(symbols));
+                out.println("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
             }
         }
 

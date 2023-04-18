@@ -24,9 +24,7 @@ public record This(ParserRuleContext ctx) implements Expression {
 
     @Override
     public void typecheck(SymbolTable symbols) throws SyntaxException {
-        System.out.println(symbols.getVariableCount());
         symbols.allocateLocalVariable(1);
-        System.out.println(symbols.getVariableCount());
     }
 
     @Override
