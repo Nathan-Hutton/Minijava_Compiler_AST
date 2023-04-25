@@ -159,6 +159,13 @@ returns [Parameter n]
     }
     ;
 
+// Other Boolean expressions:
+// <, >, <=, >=, !=, ==   Relation operators (numbers -> boolean)
+//              == and != can be used with nonnumeric values
+//              == sn object is same as .equals(), != is !.equals() for our minijava
+// == for objects compares if they're the same object
+// !, &&, ||              Logic operators  (boolean -> boolean)
+
 expression
 returns [Expression n]
     : '_print' '(' (exprs+=expression (',' exprs+=expression)*)? ')' {
@@ -232,6 +239,12 @@ returns [Expression n]
     }
     | l=expression op=('+' | '-') r=expression {
         $n = new BinaryOp($ctx, $l.n, $op.text, $r.n);
+    }
+    | l=expression op=('<' | '<=' | '>' | '>=') r=expression {
+        $n = new RelationalOp($ctx, $l.n, $r.n, $op.text);
+    }
+    | l=expression op=('==' | '!=') r=expression {
+        $n = new RelationalOp($ctx, $l.n, $r.n, $op.text);
     }
     | <assoc=right> l=expression '=' r=expression {
         $n = new Assignment($ctx, $l.n, $r.n);

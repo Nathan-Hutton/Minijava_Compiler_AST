@@ -4,6 +4,6 @@ import edu.westminstercollege.cmpt355.minijava.*;
 public sealed interface Expression extends Node
     permits IntLiteral, DoubleLiteral, BooleanLiteral, StringLiteral, VariableAccess,
     Assignment, BinaryOp, Negate, PreIncrement, PostIncrement, Cast, Print, FieldAccess,
-    MethodCall, ConstructorCall, This {
+    MethodCall, ConstructorCall, This, RelationalOp {
     Type getType(SymbolTable symbols);
 }

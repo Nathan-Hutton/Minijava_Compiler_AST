@@ -26,19 +26,22 @@ public record While(ParserRuleContext ctx, Expression condition, Statement body)
 
     @Override
     public void generateCode(PrintWriter out, SymbolTable symbols) {
-        out.println("loop_start:");
+        String loopStartLabel = symbols.newLabel("loop_start");
+        String loopEndLabel = symbols.newLabel("loop_end");
+
+        out.printf("%s:\n", loopStartLabel);
         condition.generateCode(out, symbols);
         // My condition is boolean, so the top of the stack is either true (1) or false(0)
         // If it's true (1), I should continue executing the body;      [no branch]
         // Uf it's false (0), I should jump to the end of the loop.     [branch]
-        out.println("ifeq loop_end");
+        out.printf("ifeq %s\n", loopEndLabel);
 
         body.generateCode(out, symbols);
 
         // Return to the top of the loop to check the condition again
-        out.println("goto loop_start");
+        out.printf("goto %s\n", loopStartLabel);
 
         //Point to jump to when the condition fails
-        out.println("loop_end:");
+        out.printf("%s:\n", loopEndLabel);
     }
 }
